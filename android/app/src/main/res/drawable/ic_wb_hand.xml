@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GeneralsX @feature Flux Build 07/11/2026 PLAN-032 World Builder tool bar. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M8 11 V5.5 a1.5 1.5 0 0 1 3 0 V10 h0.5 V4 a1.5 1.5 0 0 1 3 0 v6 h0.5 V5.5 a1.5 1.5 0 0 1 3 0 V14 c0 4 -2.5 7 -6.5 7 c-2.5 0 -4 -1.2 -5.2 -3 L4.2 13.8 a1.4 1.4 0 0 1 2.3 -1.6 Z" />
+</vector>
