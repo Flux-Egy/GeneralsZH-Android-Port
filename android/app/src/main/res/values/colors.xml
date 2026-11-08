@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- GeneralsX @feature Flux Build 26/10/2026 True dark mode.
+         The ground is pure black (#000000), not a navy-tinted dark. Surfaces are a
+         tight charcoal ladder (#0A0A0A through #222728), text is a soft off-white so
+         it does not bloom on OLED, and the cyan and gold accents are deliberately
+         dimmer and less saturated than the old #00E5FF / #FFC400 pair. Material 3
+         contrast is preserved: primary content stays above 4.5:1 on every surface.
+
+         The gzh_* names are the public roles used by themes.xml, UiKit.java and the
+         custom-colour path. Only the values changed. -->
+    <color name="gzh_background">#000000</color>
+    <color name="gzh_surface">#0A0A0A</color>
+    <color name="gzh_surface_container_low">#0E1010</color>
+    <color name="gzh_surface_container">#121515</color>
+    <color name="gzh_surface_container_high">#181C1D</color>
+    <color name="gzh_surface_container_highest">#222728</color>
+
+    <!-- Content on those surfaces -->
+    <color name="gzh_on_surface">#E7ECEC</color>
+    <color name="gzh_on_surface_variant">#A7B4B5</color>
+    <color name="gzh_on_surface_faint">#6D7A7B</color>
+    <color name="gzh_outline">#243234</color>
+    <color name="gzh_outline_variant">#1F6FB3BD</color>
+
+    <!-- Primary: muted tactical cyan (#6FB3BD) -->
+    <color name="gzh_primary">#6FB3BD</color>
+    <color name="gzh_on_primary">#062B2F</color>
+    <color name="gzh_primary_container">#123F44</color>
+    <color name="gzh_on_primary_container">#A6D2D6</color>
+    <color name="gzh_primary_dark">#000000</color>
+    <color name="gzh_accent">#6FB3BD</color>
+
+    <!-- Secondary: deeper slate-cyan -->
+    <color name="gzh_secondary">#4E8E96</color>
+    <color name="gzh_on_secondary">#041E21</color>
+    <color name="gzh_secondary_container">#173A3D</color>
+    <color name="gzh_on_secondary_container">#A6D2D6</color>
+
+    <!-- Tertiary: muted alert red, no neon -->
+    <color name="gzh_tertiary">#D98C82</color>
+    <color name="gzh_on_tertiary">#3A0A08</color>
+    <color name="gzh_tertiary_container">#5C1F1B</color>
+    <color name="gzh_on_tertiary_container">#F2C4BE</color>
+
+    <color name="gzh_error">#E57373</color>
+    <color name="gzh_on_error">#3A0907</color>
+    <color name="gzh_error_container">#5C1414</color>
+    <color name="gzh_on_error_container">#F4C7C3</color>
+
+    <!-- Disabled state (M3: 38% of on-surface for content, 12% for containers) -->
+    <color name="gzh_on_surface_disabled">#61E7ECEC</color>
+    <color name="gzh_container_disabled">#1FE7ECEC</color>
+    <color name="gzh_ripple_light">#1F6FB3BD</color>
+    <color name="gzh_ripple_primary">#336FB3BD</color>
+
+    <!-- Semantic status colours -->
+    <color name="gzh_status_ok">#6FB3BD</color>
+    <color name="gzh_status_warn">#C7A45C</color>
+    <color name="gzh_status_error">#E57373</color>
+    <color name="gzh_status_green">#7FB89A</color>
+    <!-- Tactical gold, used only for Play, so the primary action cannot be
+         confused with cyan selection/navigation. -->
+    <color name="gzh_gold">#C7A45C</color>
+</resources>

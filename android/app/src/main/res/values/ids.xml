@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- GeneralsX @bugfix Flux Build 07/11/2026 v1.4.1: UiKit.crossfadeText's latest text. -->
+    <item name="gzh_crossfade_text" type="id" />
+</resources>
