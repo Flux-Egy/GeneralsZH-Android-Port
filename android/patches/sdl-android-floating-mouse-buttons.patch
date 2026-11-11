@@ -1,0 +1,12 @@
+--- a/org/libsdl/app/SDLActivity.java
++++ b/org/libsdl/app/SDLActivity.java
+@@ -1086,6 +1086,9 @@
+     public static native boolean onNativeSoftReturnKey();
+     public static native void onNativeKeyboardFocusLost();
+     public static native void onNativeMouse(int button, int action, float x, float y, boolean relative);
++    // GeneralsX @feature Flux Build 23/10/2026 Floating LMB/RMB buttons: a mouse click with no
++    // screen coordinates. 1 = left, 3 = right. Implemented in the engine's JNI unit.
++    public static native void nativeInjectMouseButton(int button, boolean down);
+     public static native void onNativeTouch(int touchDevId, int pointerFingerId,
+                                             int action, float x,
+                                             float y, float p);
