@@ -135,6 +135,10 @@ jobs:
           fi
           echo "GX_ENGINE_BUILD=${N}" >> "$GITHUB_ENV"
           echo "Engine build number: ${N}"
+          # references/hud/ is gitignored (the bundled HUD packs live only on the build machine, empty
+          # there today); stageHudAssets declares it as an input and Gradle rejects a missing directory.
+          # Empty = the same APK as the local build: no bundled HUD.
+          mkdir -p references/hud
 
       - name: Build (dual Hz, four engines)
         run: |
