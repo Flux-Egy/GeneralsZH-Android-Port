@@ -326,6 +326,17 @@ protected:
 	void renderShoreLines(CameraClass *pCamera);	///<re-render parts of terrain that need custom blending into water edge
 	void renderShoreLinesSorted(CameraClass *pCamera);	///<optimized version for game usage.
 
+	// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 The terrain draw area is sized for the highest
+	// zoom (W3DView::updateTerrain, 257x193 cells on a wide phone) so zooming never rebuilds the buffers.
+	// The per-frame passes that rebuild dynamic buffers from it (shoreline and 3-way blend tiles) only
+	// need what the camera sees: the cells under the view frustum (clipped to the terrain's height
+	// range) plus one tile, set per Render() from its camera. Map cells [x0,x1) x [y0,y1); not valid =
+	// the whole draw area (reflection pass, World Builder, a subclass that never sets it).
+	Bool m_gxViewRectValid;
+	Int m_gxViewX0, m_gxViewY0, m_gxViewX1, m_gxViewY1;
+	void gxSetViewRect(const CameraClass *camera);
+	void gxClipToViewRect(Int &x0, Int &y0, Int &xEdge, Int &yEdge) const;
+
 	static Bool useCloud();
 };
 

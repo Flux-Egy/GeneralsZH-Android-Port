@@ -47,6 +47,8 @@
 //-----------------------------------------------------------------------------
 
 #include <stdlib.h>
+#include <algorithm> // GeneralsX @performance Flux Build 16/11/2026 v1.4.5 gxSetViewRect
+#include <cmath>
 #include <assetmgr.h>
 #include <texture.h>
 #include <tri.h>
@@ -249,6 +251,8 @@ BaseHeightMapRenderObjClass::BaseHeightMapRenderObjClass()
 	m_minHeight=0;
 	m_shoreLineTilePositions=nullptr;
 	m_numShoreLineTiles=0;
+	m_gxViewRectValid=FALSE; // GeneralsX @performance Flux Build 16/11/2026 v1.4.5 (gxSetViewRect)
+	m_gxViewX0=m_gxViewY0=m_gxViewX1=m_gxViewY1=0;
 	m_shoreLineSortInfos=nullptr;
 	m_shoreLineSortInfosSize=0;
 	m_shoreLineSortInfosXMajor=TRUE;
@@ -2440,6 +2444,94 @@ void BaseHeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 
 }
 
+//=============================================================================
+// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 The map cells the camera can see on the terrain.
+// Contra X on Aka's Magic (owner's logs): the terrain pass cost 3.5-3.9 ms a frame against 1.3-2.0 ms on
+// MYSOREZ 1.4.1 (same map, mod and speed) -- its own draws only 0.15 ms of it. The tiles are culled to
+// the view already; the shoreline and 3-way blend passes rebuilt their dynamic buffers each frame for
+// every tile of the whole draw area, ~3x the retail 129x129 since the area is sized for maximum zoom.
+// The view volume: the frustum's 12 edges clipped to the slab between the lowest and highest terrain
+// (a margin above and below), the XY bounds of what is left, then one vertex-buffer tile (32 cells)
+// each side. Conservative: a cell outside it is outside the frustum at every terrain height.
+// Client-side drawing only: no logic, no CRC.
+//=============================================================================
+void BaseHeightMapRenderObjClass::gxSetViewRect(const CameraClass *camera)
+{
+	m_gxViewRectValid = FALSE;
+	if (camera == nullptr || m_map == nullptr || TheGlobalData == nullptr || TheGlobalData->m_isWorldBuilder)
+		return;
+	// Water reflection draws with inverted culling through a mirrored camera: keep the whole area there.
+	if (ShaderClass::Is_Backface_Culling_Inverted())
+		return;
+	const Vector3 *c = camera->Get_Frustum_Corners();
+	if (c == nullptr)
+		return;
+	const Real zLo = m_minHeight - 50.0f;
+	const Real zHi = m_maxHeight + 50.0f;
+	// Near corners 0..3 (upper left, upper right, lower left, lower right), far 4..7 the same way.
+	static const Int s_edges[12][2] = {
+		{0,4},{1,5},{2,6},{3,7},	// sides
+		{0,1},{1,3},{3,2},{2,0},	// near plane
+		{4,5},{5,7},{7,6},{6,4} };	// far plane
+	Real minX = 0, minY = 0, maxX = 0, maxY = 0;
+	Bool any = FALSE;
+	auto addPoint = [&](const Vector3 &p) {
+		if (!any) { minX = maxX = p.X; minY = maxY = p.Y; any = TRUE; return; }
+		if (p.X < minX) minX = p.X;
+		if (p.X > maxX) maxX = p.X;
+		if (p.Y < minY) minY = p.Y;
+		if (p.Y > maxY) maxY = p.Y;
+	};
+	for (Int e = 0; e < 12; ++e)
+	{
+		Vector3 a = c[s_edges[e][0]];
+		Vector3 b = c[s_edges[e][1]];
+		// Clip the segment a-b to zLo <= z <= zHi (Liang-Barsky in one axis).
+		Real t0 = 0.0f, t1 = 1.0f;
+		const Real dz = b.Z - a.Z;
+		if (fabsf(dz) < 1.0e-6f)
+		{
+			if (a.Z < zLo || a.Z > zHi)
+				continue;
+		}
+		else
+		{
+			Real tLo = (zLo - a.Z) / dz;
+			Real tHi = (zHi - a.Z) / dz;
+			if (tLo > tHi) { const Real t = tLo; tLo = tHi; tHi = t; }
+			if (tLo > t0) t0 = tLo;
+			if (tHi < t1) t1 = tHi;
+			if (t0 > t1)
+				continue;
+		}
+		addPoint(a + (b - a) * t0);
+		addPoint(a + (b - a) * t1);
+	}
+	if (!any)
+		return;	// nothing of the terrain's height range in view: keep the whole area (never seen in practice)
+	// World X/Y -> map cells (world x = (cellX - border) * MAP_XY_FACTOR), one tile of margin each side.
+	const Int border = m_map->getBorderSizeInline();
+	const Int tile = VERTEX_BUFFER_TILE_LENGTH; // 32 cells (WorldHeightMap.h)
+	const Real big = 1.0e6f;
+	auto cellOf = [&](Real w) { return (Int)floorf(std::max(-big, std::min(big, w)) / MAP_XY_FACTOR) + border; };
+	m_gxViewX0 = cellOf(minX) - tile;
+	m_gxViewY0 = cellOf(minY) - tile;
+	m_gxViewX1 = cellOf(maxX) + 1 + tile;
+	m_gxViewY1 = cellOf(maxY) + 1 + tile;
+	m_gxViewRectValid = TRUE;
+}
+
+// Narrows a pass's [x0,xEdge) x [y0,yEdge) cell range to the view rectangle, when there is one.
+void BaseHeightMapRenderObjClass::gxClipToViewRect(Int &x0, Int &y0, Int &xEdge, Int &yEdge) const
+{
+	if (!m_gxViewRectValid)
+		return;
+	if (x0 < m_gxViewX0) x0 = m_gxViewX0;
+	if (y0 < m_gxViewY0) y0 = m_gxViewY0;
+	if (xEdge > m_gxViewX1) xEdge = m_gxViewX1;
+	if (yEdge > m_gxViewY1) yEdge = m_gxViewY1;
+}
+
 /**Render parts of terrain that are along the coast line and have vertices directly under the
 water plane.  Applying a custom render to these polygons allows for a smoother land->water
 transition*/
@@ -2632,6 +2724,10 @@ void BaseHeightMapRenderObjClass::renderShoreLinesSorted(CameraClass *pCamera)
 		drawEdgeY = m_map->getYExtent()-1;
 	Int drawStartX=m_map->getDrawOrgX();
 	Int drawStartY=m_map->getDrawOrgY();
+	// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 Only the cells the camera sees (gxSetViewRect).
+	gxClipToViewRect(drawStartX, drawStartY, drawEdgeX, drawEdgeY);
+	if (drawEdgeX <= drawStartX || drawEdgeY <= drawStartY)
+		return;	//nothing of the draw area in view
 
 	if (m_shoreLineSortInfosXMajor)	//map is wider than taller.
 	{

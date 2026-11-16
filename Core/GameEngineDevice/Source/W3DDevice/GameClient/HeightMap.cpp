@@ -46,6 +46,8 @@
 //         Includes
 //-----------------------------------------------------------------------------
 #include <chrono> // GeneralsX 09/11/2026
+#include "GXTrace.h" // GeneralsX 16/11/2026 [GX-PERF-SCENE-TERRAIN]
+#include <algorithm>
 #include "W3DDevice/GameClient/HeightMap.h"
 #include "W3DDevice/GameClient/GXPreRttStats.h"
 
@@ -179,6 +181,46 @@ VERTEX_FORMAT *HeightMapRenderObjClass::getVertexBufferBackup(Int x, Int y)
 
 // GeneralsX @performance Flux Build 09/11/2026 [GX-TERRAIN-LIGHT] counters (On_Frame_Update).
 static Int s_gxTilesRelit = 0, s_gxTilesSkipped = 0, s_gxTilesRebuilt = 0, s_gxLightFrames = 0, s_gxLightMaxLights = 0;
+
+// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 [GX-PERF-SCENE-TERRAIN], once a second with the perf
+// trace on: where HeightMapRenderObjClass::Render's time goes (the scene's "terrain" phase) and how many
+// cells it worked on -- the draw area, the part of it in view (gxSetViewRect), terrain tiles drawn, and the
+// shoreline / 3-way blend tiles rebuilt per render. A render is one camera pass (water reflection adds one).
+static Int s_gxBlendTilesBuilt = 0;
+namespace {
+struct GxTerrainPerf
+{
+	std::chrono::steady_clock::time_point window = std::chrono::steady_clock::now();
+	unsigned renders = 0;
+	double tilesMs = 0, shoreMs = 0, blendMs = 0, propsMs = 0, otherMs = 0;
+	double tilesDrawn = 0, shoreTiles = 0, blendTiles = 0, viewCells = 0, drawCells = 0;
+	Int tilesTotal = 0, blendTotal = 0, drawW = 0, drawH = 0, viewW = 0, viewH = 0;
+};
+GxTerrainPerf s_gxTerrainPerf;
+}
+
+static void gxNoteTerrainRender(double tilesMs, double shoreMs, double blendMs, double propsMs, double otherMs,
+	Int tilesDrawn, Int tilesTotal, Int shoreTiles, Int blendTiles, Int blendTotal,
+	Int drawW, Int drawH, Int viewW, Int viewH)
+{
+	GxTerrainPerf &p = s_gxTerrainPerf;
+	++p.renders;
+	p.tilesMs += tilesMs; p.shoreMs += shoreMs; p.blendMs += blendMs; p.propsMs += propsMs; p.otherMs += otherMs;
+	p.tilesDrawn += tilesDrawn; p.shoreTiles += shoreTiles; p.blendTiles += blendTiles;
+	p.drawCells += (double)drawW * drawH; p.viewCells += (double)viewW * viewH;
+	p.tilesTotal = tilesTotal; p.blendTotal = blendTotal; p.drawW = drawW; p.drawH = drawH; p.viewW = viewW; p.viewH = viewH;
+	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	if (now - p.window < std::chrono::seconds(1))
+		return;
+	const double n = p.renders;
+	GX_PERF_TRACE("[GX-PERF-SCENE-TERRAIN] renders=%u ms/render: tiles=%.2f shore=%.2f blend=%.2f props=%.2f other=%.2f total=%.2f"
+		" | cells: draw area %dx%d, in view %dx%d (%.0f%%), tiles drawn %.1f of %d, shoreline %.0f, 3-way blend %.0f of %d\n",
+		p.renders, p.tilesMs / n, p.shoreMs / n, p.blendMs / n, p.propsMs / n, p.otherMs / n,
+		(p.tilesMs + p.shoreMs + p.blendMs + p.propsMs + p.otherMs) / n,
+		p.drawW, p.drawH, p.viewW, p.viewH, p.drawCells > 0 ? 100.0 * p.viewCells / p.drawCells : 100.0,
+		p.tilesDrawn / n, p.tilesTotal, p.shoreTiles / n, p.blendTiles / n, p.blendTotal);
+	p = GxTerrainPerf();
+}
 static std::chrono::steady_clock::time_point s_gxLightWindow = std::chrono::steady_clock::now();
 
 //=============================================================================
@@ -2134,6 +2176,15 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 	}
 #endif
 
+	// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 The cells this camera sees, for the shoreline and
+	// 3-way blend passes below (gxSetViewRect); the phase timing for [GX-PERF-SCENE-TERRAIN].
+	gxSetViewRect(&rinfo.Camera);
+	const bool gxPerf = GXTrace::isPerfEnabled();
+	typedef std::chrono::steady_clock GxClock;
+	GxClock::time_point gxT0, gxT1, gxT2, gxT3, gxT4;
+	if (gxPerf) gxT0 = GxClock::now();
+	Int gxTilesDrawn = 0;
+
 	DX8Wrapper::Set_Light_Environment(rinfo.light_environment);
 
 	// Force shaders to update.
@@ -2249,6 +2300,8 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 				// GeneralsX @performance Flux Build 09/11/2026 Tiles out of view are not drawn.
 				if (!gxTileInView(&rinfo.Camera, i, j))
 					continue;
+				if (pass == 0)
+					++gxTilesDrawn; // GeneralsX 16/11/2026 [GX-PERF-SCENE-TERRAIN]
 				DX8Wrapper::Set_Vertex_Buffer(getVertexBufferTile(i, j));
 #ifdef PRE_TRANSFORM_VERTEX
 				if (m_xformedVertexBuffer && pass==0) {
@@ -2274,6 +2327,7 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 			}
 	}
 
+	if (gxPerf) gxT1 = GxClock::now();
 	if (!doMultiPassWireFrame)
 	{
 		if (pass)	//shader was applied at least once?
@@ -2281,10 +2335,13 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 
 		//Draw feathered shorelines
 		renderShoreLines(&rinfo.Camera);
+		if (gxPerf) gxT2 = GxClock::now();
 
 		//Do additional pass over any tiles that have 3 textures blended together.
+		s_gxBlendTilesBuilt = 0;
 		if (TheGlobalData->m_use3WayTerrainBlends)
 			renderExtraBlendTiles();
+		if (gxPerf) gxT3 = GxClock::now();
 
 		Int yCoordMin = m_map->getDrawOrgY();
 		Int yCoordMax = m_y+m_map->getDrawOrgY()-1;
@@ -2317,6 +2374,7 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 	if (m_propBuffer) {
 		m_propBuffer->drawProps(rinfo);
 	}
+		if (gxPerf) gxT4 = GxClock::now();
 	#ifdef DO_SCORCH
 		DX8Wrapper::Set_Texture(0,nullptr);
 		DX8Wrapper::Set_Texture(1,nullptr);
@@ -2363,6 +2421,18 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 	ShaderClass::Invalidate();
 	DX8Wrapper::Set_Material(nullptr);
 
+	// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 [GX-PERF-SCENE-TERRAIN] (the normal pass only).
+	if (gxPerf && !doMultiPassWireFrame)
+	{
+		auto ms = [](GxClock::time_point a, GxClock::time_point b) { return std::chrono::duration<double, std::milli>(b - a).count(); };
+		const Int drawW = m_map->getDrawWidth(), drawH = m_map->getDrawHeight();
+		Int vx0 = m_map->getDrawOrgX(), vy0 = m_map->getDrawOrgY();
+		Int vx1 = vx0 + drawW, vy1 = vy0 + drawH;
+		gxClipToViewRect(vx0, vy0, vx1, vy1);
+		gxNoteTerrainRender(ms(gxT0, gxT1), ms(gxT1, gxT2), ms(gxT2, gxT3), ms(gxT3, gxT4), ms(gxT4, GxClock::now()),
+			gxTilesDrawn, m_numVBTilesX * m_numVBTilesY, m_numVisibleShoreLineTiles, s_gxBlendTilesBuilt, m_numExtraBlendTiles,
+			drawW, drawH, std::max(0, vx1 - vx0), std::max(0, vy1 - vy0));
+	}
 }
 
 
@@ -2419,6 +2489,7 @@ void HeightMapRenderObjClass::renderExtraBlendTiles()
 	static Int maxBlendTiles = DEFAULT_MAX_FRAME_EXTRABLEND_TILES;
 
 	m_numVisibleExtraBlendTiles = 0;
+	s_gxBlendTilesBuilt = 0;
 
 	if (!m_numExtraBlendTiles)
 		return;	//nothing to draw
@@ -2448,6 +2519,9 @@ void HeightMapRenderObjClass::renderExtraBlendTiles()
 			drawEdgeY = m_map->getYExtent()-1;
 		Int drawStartX=m_map->getDrawOrgX();
 		Int drawStartY=m_map->getDrawOrgY();
+		// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 Only the cells the camera sees (gxSetViewRect):
+		// every tile built here is rebuilt every frame (UVs, 4 diffuse lookups, a dynamic buffer).
+		gxClipToViewRect(drawStartX, drawStartY, drawEdgeX, drawEdgeY);
 
 		for (Int j=0; j<m_numExtraBlendTiles; j++)
 		{
@@ -2551,6 +2625,7 @@ void HeightMapRenderObjClass::renderExtraBlendTiles()
 		}
 	}
 
+	s_gxBlendTilesBuilt = vertexCount / 4; // GeneralsX 16/11/2026 [GX-PERF-SCENE-TERRAIN]
 	if (vertexCount)
 	{
 		//Check if we couldn't fit all blend tiles into vertex buffer so we can enlarge it for next frame.
