@@ -129,6 +129,7 @@ extern NGMPGame* TheNGMPGame;
 
 #include <rts/profile.h>
 #include "GXTrace.h"
+#include "Common/GXLogicPerf.h" // GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-PERF-LOGIC]
 #include "Common/GXReplayCheck.h"
 #include "Common/GXCrcStream.h"
 
@@ -4224,17 +4225,25 @@ void GameLogic::update()
 
 	PROFILER_PLOT("LogicFrame", static_cast<int64_t>(now));
 
+	// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-PERF-LOGIC] phase times (GXLogicPerf.h; with the
+	// performance trace on only). Timing only: the update below runs exactly as before.
+	GXLogicPerf::StepTimer gxLogicTimer;
+
 	// update (execute) scripts
 	{
 		TheScriptEngine->UPDATE();
 	}
 	GX_FP_BLAME("ScriptEngine", nullptr, nullptr);
+	gxLogicTimer.mark(GXLogicPerf::SCRIPTS);
 
 	// TheSuperHackers @info Updates the frozen time status because it may have changed after the script engine update.
 	TheFramePacer->setTimeFrozen(TheGameEngine->isTimeFrozen());
 
 	if (TheFramePacer->isTimeFrozen())
+	{
+		gxLogicTimer.cancel(); // GeneralsX 17/11/2026 12204 review: not a logic step for [GX-PERF-LOGIC]
 		return;
+	}
 
 	// Note - TerrainLogic update needs to happen after ScriptEngine update, but before object updates.  jba.
 	// This way changes in bridges are noted in the script engine before being cleared in TerrainLogic->update
@@ -4242,6 +4251,7 @@ void GameLogic::update()
 		TheTerrainLogic->UPDATE();
 	}
 	GX_FP_BLAME("TerrainLogic", nullptr, nullptr);
+	gxLogicTimer.mark(GXLogicPerf::TERRAIN);
 
 	// force CRC calculation, so we can keep a cache of the last N CRCs.  We do this right where the recorder
 	// would be getting the CRC anyway, so replays can get the CRCs from the exact instant in time as the original.
@@ -4310,6 +4320,7 @@ void GameLogic::update()
 		processCommandList( TheCommandList );
 	}
 	GX_FP_BLAME("Commands", nullptr, nullptr);
+	gxLogicTimer.mark(GXLogicPerf::CRC_COMMANDS);
 
 #ifdef ALLOW_NONSLEEPY_UPDATES
 	{
@@ -4398,24 +4409,28 @@ void GameLogic::update()
 	}
 
 	validateSleepyUpdate();
+	gxLogicTimer.mark(GXLogicPerf::OBJECTS);
 
 	// update the Artificial Intelligence system
 	{
 		TheAI->UPDATE();
 	}
 	GX_FP_BLAME("AI", nullptr, nullptr);
+	gxLogicTimer.mark(GXLogicPerf::AI);
 
 	// production updates
 	{
 		TheBuildAssistant->UPDATE();
 	}
 	GX_FP_BLAME("BuildAssistant", nullptr, nullptr);
+	gxLogicTimer.mark(GXLogicPerf::BUILD);
 
 	// update partition info
 	{
 		ThePartitionManager->UPDATE();
 	}
 	GX_FP_BLAME("PartitionManager", nullptr, nullptr);
+	gxLogicTimer.mark(GXLogicPerf::PARTITION);
 
 	//
 	// End of frame clean-up
@@ -4424,6 +4439,7 @@ void GameLogic::update()
 	// destroy all pending objects
 	processDestroyList();
 	GX_FP_BLAME("DestroyList", nullptr, nullptr);
+	gxLogicTimer.mark(GXLogicPerf::DESTROY);
 
 	// reset the command list, destroying all messages
 	TheCommandList->reset();

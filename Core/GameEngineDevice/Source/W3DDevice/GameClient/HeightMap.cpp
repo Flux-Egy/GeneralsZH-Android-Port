@@ -2179,6 +2179,7 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 	// GeneralsX @performance Flux Build 16/11/2026 v1.4.5 The cells this camera sees, for the shoreline and
 	// 3-way blend passes below (gxSetViewRect); the phase timing for [GX-PERF-SCENE-TERRAIN].
 	gxSetViewRect(&rinfo.Camera);
+	gxCheckViewRect(); // GeneralsX @bugfix Flux Build 17/11/2026 v1.4.5 12204 once a second (owner's fog report)
 	const bool gxPerf = GXTrace::isPerfEnabled();
 	typedef std::chrono::steady_clock GxClock;
 	GxClock::time_point gxT0, gxT1, gxT2, gxT3, gxT4;

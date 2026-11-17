@@ -1036,6 +1036,23 @@ extern NGMPGame* TheNGMPGame;
 // the same order, only grouped differently between draws: replays and saves are unaffected.
 static UnsignedInt s_gxCatchUpSteps = 0;
 
+// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 The owner's A/B switch, as in Zero Hour:
+// gx_speed_catchup_off.txt in the game folder turns the catch-up off (at most one logic step per drawn frame).
+static Bool gxCatchUpSwitchedOff()
+{
+	static int s_state = -1;
+	if (s_state < 0)
+	{
+		FILE *f = fopen("gx_speed_catchup_off.txt", "r");
+		s_state = f != nullptr ? 1 : 0;
+		if (f != nullptr)
+			fclose(f);
+		fprintf(stderr, "[GX-PERF-LOGIC] speed catch-up %s\n", s_state ? "OFF (gx_speed_catchup_off.txt): at most one logic step per drawn frame"
+			: "on (up to 3 extra logic steps a frame, 8 ms, offline above normal speed)");
+	}
+	return s_state == 1;
+}
+
 static void gxCatchUpSpedUpLogic(Bool steppedThisFrame)
 {
 	static std::chrono::steady_clock::time_point s_last;
@@ -1071,7 +1088,8 @@ static void gxCatchUpSpedUpLogic(Bool steppedThisFrame)
 		&& TheShell != nullptr && !TheShell->isShellActive()
 		&& !TheFramePacer->isTimeFrozen() && !TheFramePacer->isGameHalted()
 		&& TheFramePacer->isActualFramesPerSecondLimitEnabled()
-		&& gxTargetFps > normalFps;
+		&& gxTargetFps > normalFps
+		&& !gxCatchUpSwitchedOff();
 	if (!applies)
 	{
 		s_debt = 0.0;

@@ -336,6 +336,12 @@ protected:
 	Int m_gxViewX0, m_gxViewY0, m_gxViewX1, m_gxViewY1;
 	void gxSetViewRect(const CameraClass *camera);
 	void gxClipToViewRect(Int &x0, Int &y0, Int &xEdge, Int &yEdge) const;
+	// GeneralsX @bugfix Flux Build 17/11/2026 v1.4.5 12204 Self-check of the view rect (owner's fog report): once a
+	// second, nine screen points are picked on the terrain through the tactical view (screenToTerrain, the
+	// mouse's own picking); a point outside the rect means it would clip what is on screen -- logged as
+	// [GX-TERRAIN-VIEW], and after two such checks in a row the rect is off for the rest of the session.
+	// gx_terrain_viewrect_off.txt in the game folder turns it off from the start (A/B test).
+	void gxCheckViewRect();
 
 	static Bool useCloud();
 };

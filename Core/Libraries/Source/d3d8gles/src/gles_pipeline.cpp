@@ -55,6 +55,7 @@ static void gxWriteMsaaCaps(int maxSamples);
 #include <thread>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <dirent.h> // GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-THREADS]
 
 #if defined(__ANDROID__)
 #include <android/native_window.h>
@@ -3448,16 +3449,108 @@ static std::string ReadThermalLine()
 	return line;
 }
 
+// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-THREADS] (owner: Snapdragon 8+ Gen 1, MYSOREZ 1.4.1
+// smooth and Flux not): every thread of the game's process with its share of one core since the last read, its
+// state and the core it last ran on (/proc/self/task/<tid>/stat), busiest first, read on the same background
+// thread as the clocks. Shows whether the engine's thread sits on a slow core or shares one with another thread.
+static std::string s_threadsLine;
+
+struct GxThreadSample { int tid; unsigned long long ticks; };
+
+static std::string ReadThreadsLine(std::vector<GxThreadSample> &prev, std::chrono::steady_clock::time_point &prevAt)
+{
+	struct Row { int tid; std::string name; double pct; int cpu; char state; };
+	std::vector<Row> rows;
+	std::vector<GxThreadSample> now;
+	const auto at = std::chrono::steady_clock::now();
+	const double secs = prev.empty() ? 0.0 : std::chrono::duration<double>(at - prevAt).count();
+	const long hz = sysconf(_SC_CLK_TCK) > 0 ? sysconf(_SC_CLK_TCK) : 100;
+	DIR *d = opendir("/proc/self/task");
+	if (d == nullptr)
+		return std::string();
+	int count = 0;
+	while (struct dirent *e = readdir(d)) {
+		const int tid = atoi(e->d_name);
+		if (tid <= 0)
+			continue;
+		++count;
+		char path[64];
+		snprintf(path, sizeof(path), "/proc/self/task/%d/stat", tid);
+		FILE *f = fopen(path, "r");
+		if (f == nullptr)
+			continue;
+		char buf[1024];
+		const size_t n = fread(buf, 1, sizeof(buf) - 1, f);
+		fclose(f);
+		buf[n] = '\0';
+		// "tid (comm) state f4 ... f14 utime f15 stime ... f39 processor": comm may hold spaces and parentheses.
+		char *open = strchr(buf, '(');
+		char *close = strrchr(buf, ')');
+		if (open == nullptr || close == nullptr || close < open)
+			continue;
+		std::string name(open + 1, close - open - 1);
+		std::vector<char *> tok;
+		char *save = nullptr; // strtok_r: the engine's own thread uses strtok (INI parsing)
+		for (char *t = strtok_r(close + 1, " ", &save); t != nullptr; t = strtok_r(nullptr, " ", &save))
+			tok.push_back(t);
+		if (tok.size() < 37)
+			continue;
+		const unsigned long long ticks = strtoull(tok[11], nullptr, 10) + strtoull(tok[12], nullptr, 10);
+		now.push_back({ tid, ticks });
+		double pct = 0.0;
+		for (const GxThreadSample &p : prev) {
+			if (p.tid == tid) {
+				if (secs > 0.0 && ticks >= p.ticks)
+					pct = 100.0 * (double)(ticks - p.ticks) / (double)hz / secs;
+				break;
+			}
+		}
+		rows.push_back({ tid, name, pct, atoi(tok[36]), tok[0][0] });
+	}
+	closedir(d);
+	prev.swap(now);
+	prevAt = at;
+	if (secs <= 0.0)
+		return std::string(); // the first read only sets the baseline
+	std::sort(rows.begin(), rows.end(), [](const Row &a, const Row &b) { return a.pct > b.pct; });
+	std::string line;
+	char head[96];
+	snprintf(head, sizeof(head), "[GX-THREADS] %d threads, over %.1f s (%% of one core, last core, state):", count, secs);
+	line = head;
+	int shown = 0;
+	double rest = 0.0;
+	for (const Row &r : rows) {
+		if (shown >= 8 || r.pct < 1.0) {
+			rest += r.pct;
+			continue;
+		}
+		char item[96];
+		snprintf(item, sizeof(item), " %s/%d %.0f%% cpu%d %c%s", r.name.c_str(), r.tid, r.pct, r.cpu, r.state,
+			r.tid == (int)gettid() ? "(stats)" : (r.tid == getpid() ? "(ui)" : ""));
+		line += item;
+		++shown;
+	}
+	char tail[48];
+	snprintf(tail, sizeof(tail), " | others %.0f%%\n", rest);
+	line += tail;
+	return line;
+}
+
 static std::string ThermalLine()
 {
 	if (!s_thermalStarted.exchange(true)) {
 		std::thread([] {
 			setpriority(PRIO_PROCESS, (id_t)gettid(), 10);
+			std::vector<GxThreadSample> prev;
+			std::chrono::steady_clock::time_point prevAt;
 			for (;;) {
 				std::string l = ReadThermalLine();
+				std::string t = ReadThreadsLine(prev, prevAt);
 				{
 					std::lock_guard<std::mutex> lock(s_thermalMutex);
 					s_thermalLine.swap(l);
+					if (!t.empty())
+						s_threadsLine.swap(t);
 				}
 				std::this_thread::sleep_for(std::chrono::seconds(2));
 			}
@@ -3465,6 +3558,12 @@ static std::string ThermalLine()
 	}
 	std::lock_guard<std::mutex> lock(s_thermalMutex);
 	return s_thermalLine;
+}
+
+static std::string ThreadsLine()
+{
+	std::lock_guard<std::mutex> lock(s_thermalMutex);
+	return s_threadsLine;
 }
 
 extern "C" int d3d8gles_SetDrawCategory(int category)
@@ -4866,6 +4965,9 @@ void WebGLPipeline::present()
 				const std::string thermal = ThermalLine();
 				if (!thermal.empty())
 					fputs(thermal.c_str(), stderr);
+				const std::string threads = ThreadsLine();
+				if (!threads.empty())
+					fputs(threads.c_str(), stderr);
 			}
 			{
 				const gxrt::Stats rt = gxrt::takeStats();

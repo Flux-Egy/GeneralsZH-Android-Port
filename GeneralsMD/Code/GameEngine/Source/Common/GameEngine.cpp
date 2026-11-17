@@ -46,6 +46,7 @@
 #include "Common/GameAudio.h"
 #include "Common/GXPerfGuard.h"
 #include "Common/GXLifecycle.h"
+#include "Common/GXLogicPerf.h" // GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-PERF-LOGIC]
 #include "Common/GameEngine.h"
 #include "Common/GXReplayCheck.h"
 #include "Common/INI.h"
@@ -1203,6 +1204,32 @@ extern NGMPGame* TheNGMPGame;
 // the same order, only grouped differently between draws: replays and saves are unaffected.
 static UnsignedInt s_gxCatchUpSteps = 0;
 
+// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 The owner's A/B switch: gx_speed_catchup_off.txt in the
+// game folder turns the catch-up off -- one logic step per drawn frame at most, so a phone that cannot draw the game
+// speed plays slower instead of stepping 2-4 times between some frames (MYSOREZ 1.4.1 on the Snapdragon 8+ Gen 1 log:
+// 7.5 catch-up steps a second; Flux: 62). Offline only, as the catch-up itself; the steps and their order are the same.
+static Bool gxCatchUpSwitchedOff()
+{
+	static int s_state = -1;
+	if (s_state < 0)
+	{
+		FILE *f = fopen("gx_speed_catchup_off.txt", "r");
+		s_state = f != nullptr ? 1 : 0;
+		if (f != nullptr)
+			fclose(f);
+		fprintf(stderr, "[GX-PERF-LOGIC] speed catch-up %s\n", s_state ? "OFF (gx_speed_catchup_off.txt): at most one logic step per drawn frame"
+			: "on (up to 3 extra logic steps a frame, 8 ms, offline above normal speed)");
+	}
+	return s_state == 1;
+}
+
+// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-PERF-LOGIC]: the old "logic" window split -- the
+// GeneralsOnline services tick, the freeze gate and canUpdateGameLogic ("pacing"), the frame's own GameLogic::update,
+// the client step after it, and the catch-up steps (GXLogicPerf.h has the phases inside every update). Microseconds,
+// summed over the [GX-PERF] window; only while the performance trace is on.
+static double s_gxLpOnlineUs = 0, s_gxLpPacingUs = 0, s_gxLpOwnUs = 0, s_gxLpClientStepUs = 0, s_gxLpCatchUpUs = 0;
+static UnsignedInt s_gxLpOwnSteps = 0;
+
 static void gxCatchUpSpedUpLogic(Bool steppedThisFrame)
 {
 	static std::chrono::steady_clock::time_point s_last;
@@ -1238,7 +1265,8 @@ static void gxCatchUpSpedUpLogic(Bool steppedThisFrame)
 		&& TheShell != nullptr && !TheShell->isShellActive()
 		&& !TheFramePacer->isTimeFrozen() && !TheFramePacer->isGameHalted()
 		&& TheFramePacer->isActualFramesPerSecondLimitEnabled()
-		&& gxTargetFps > normalFps;
+		&& gxTargetFps > normalFps
+		&& !gxCatchUpSwitchedOff();
 	if (!applies)
 	{
 		s_debt = 0.0;
@@ -1351,6 +1379,28 @@ static void gxTraceEngineUpdatePhase(
 		GX_PERF_TRACE("[GX-PERF-HITCH] hitches=%d worstFrameMs=%.1f (radar=%.1f audio=%.1f client=%.1f network=%.1f logic=%.1f step=%.1f) speedCatchUpSteps=%u\n",
 			s_hitches, s_worstMs, s_worstPhases[0], s_worstPhases[1], s_worstPhases[2], s_worstPhases[3],
 			s_worstPhases[4], s_worstPhases[5], s_gxCatchUpSteps);
+
+		// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-PERF-LOGIC] (see s_gxLpOnlineUs, GXLogicPerf.h).
+		{
+			GXLogicPerf::Totals &lt = GXLogicPerf::totals();
+			const double f = (double)s_frames;
+			const double u = lt.updates > 0 ? (double)lt.updates : 1.0;
+			double perUpdate = 0.0;
+			for (int i = 0; i < GXLogicPerf::PHASE_COUNT; ++i)
+				perUpdate += lt.us[i];
+			char phases[320];
+			int len = 0;
+			for (int i = 0; i < GXLogicPerf::PHASE_COUNT && len < (int)sizeof(phases) - 32; ++i)
+				len += snprintf(phases + len, sizeof(phases) - len, " %s=%.2f", GXLogicPerf::name(i), lt.us[i] / 1000.0 / u);
+			GX_PERF_TRACE("[GX-PERF-LOGIC] ms/frame: online=%.2f pacing=%.2f ownStep=%.2f (%u steps) clientStep=%.2f catchUp=%.2f (%u steps)"
+				" | %u logic updates, ms each: total=%.2f%s\n",
+				s_gxLpOnlineUs / 1000.0 / f, s_gxLpPacingUs / 1000.0 / f, s_gxLpOwnUs / 1000.0 / f, s_gxLpOwnSteps,
+				s_gxLpClientStepUs / 1000.0 / f, s_gxLpCatchUpUs / 1000.0 / f, s_gxCatchUpSteps,
+				lt.updates, perUpdate / 1000.0 / u, phases);
+			lt = GXLogicPerf::Totals();
+			s_gxLpOnlineUs = s_gxLpPacingUs = s_gxLpOwnUs = s_gxLpClientStepUs = s_gxLpCatchUpUs = 0;
+			s_gxLpOwnSteps = 0;
+		}
 		s_gxCatchUpSteps = 0;
 		s_prevAvgMs = (elapsedUs / 1000.0) / s_frames;
 		s_hitches = 0;
@@ -1459,9 +1509,13 @@ void GameEngine::update()
 
 			if (NGMP_OnlineServicesManager::GetInstance() != nullptr)
 			{
+				const std::chrono::steady_clock::time_point gxOnline0 = gxPerfTrace ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point();
 				NGMP_OnlineServicesManager::GetInstance()->Tick();
+				if (gxPerfTrace)
+					s_gxLpOnlineUs += std::chrono::duration<double, std::micro>(std::chrono::steady_clock::now() - gxOnline0).count();
 			}
 		}
+		const std::chrono::steady_clock::time_point gxPacing0 = gxPerfTrace ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point();
 
 		// GeneralsX @feature 22/10/2026 Flux Build: Live Tick Performance Monitoring (55 FPS gate)
 		static double s_freezeDurationMs = 0.0;
@@ -1508,11 +1562,18 @@ void GameEngine::update()
 		double logicUs = 0.0, stepUs = 0.0;
 		// GeneralsX @feature Flux Build 08/11/2026 v1.4.2 kept for the speed catch-up below
 		const Bool gxSteppedThisFrame = canUpdateGameLogic(FramePacer::IgnoreFrozenTime);
+		if (gxPerfTrace)
+			s_gxLpPacingUs += std::chrono::duration<double, std::micro>(std::chrono::steady_clock::now() - gxPacing0).count();
 		if (gxSteppedThisFrame)
 		{
 			auto logicStart = std::chrono::steady_clock::now();
 			TheGameLogic->UPDATE();
 			auto logicEnd = std::chrono::steady_clock::now();
+			if (gxPerfTrace)
+			{
+				s_gxLpOwnUs += std::chrono::duration<double, std::micro>(logicEnd - logicStart).count();
+				++s_gxLpOwnSteps;
+			}
 			if (gxPerfTrace) gxT5 = logicEnd;
 			double tickMs = std::chrono::duration<double, std::milli>(logicEnd - logicStart).count();
 			// GeneralsX @feature Flux Build 05/11/2026 The tick-time warning (> 18.2 ms) and kick
@@ -1530,10 +1591,16 @@ void GameEngine::update()
 				std::chrono::steady_clock::time_point gxT6 = std::chrono::steady_clock::now();
 				logicUs = std::chrono::duration<double, std::micro>(gxT5 - gxT4).count();
 				stepUs = std::chrono::duration<double, std::micro>(gxT6 - gxT5).count();
+				s_gxLpClientStepUs += stepUs;
 			}
 		}
 
-		gxCatchUpSpedUpLogic(gxSteppedThisFrame);
+		{
+			const std::chrono::steady_clock::time_point gxCatch0 = gxPerfTrace ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point();
+			gxCatchUpSpedUpLogic(gxSteppedThisFrame);
+			if (gxPerfTrace)
+				s_gxLpCatchUpUs += std::chrono::duration<double, std::micro>(std::chrono::steady_clock::now() - gxCatch0).count();
+		}
 
 		// GeneralsX @feature Android port 23/09/2026 Replay check: fast-forward extra
 		// logic frames and quit with a result file when asked to (GXReplayCheck.h).

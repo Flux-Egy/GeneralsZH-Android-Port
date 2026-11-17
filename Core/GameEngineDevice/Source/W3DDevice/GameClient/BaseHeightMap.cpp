@@ -48,6 +48,8 @@
 
 #include <stdlib.h>
 #include <algorithm> // GeneralsX @performance Flux Build 16/11/2026 v1.4.5 gxSetViewRect
+#include <chrono> // GeneralsX @bugfix Flux Build 17/11/2026 v1.4.5 12204 gxCheckViewRect
+#include <cstdio>
 #include <cmath>
 #include <assetmgr.h>
 #include <texture.h>
@@ -64,6 +66,7 @@
 
 #include "GameClient/TerrainVisual.h"
 #include "GameClient/View.h"
+#include "GameLogic/GameLogic.h" // GeneralsX 17/11/2026 12204 gxCheckViewRect: in a match only
 #include "GameClient/Water.h"
 
 #include "GameLogic/AIPathfind.h"
@@ -2455,10 +2458,31 @@ void BaseHeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 // each side. Conservative: a cell outside it is outside the frustum at every terrain height.
 // Client-side drawing only: no logic, no CRC.
 //=============================================================================
+// GeneralsX @bugfix Flux Build 17/11/2026 v1.4.5 12204 The view rect's off switches: the owner's A/B file, or the
+// self-check below having caught it clipping something on screen (then off for the rest of the session).
+static int s_gxViewRectSwitch = -1;	// -1 unread, 0 on, 1 off (gx_terrain_viewrect_off.txt)
+static Bool s_gxViewRectFailed = FALSE;
+
+static Bool gxViewRectSwitchedOff()
+{
+	if (s_gxViewRectSwitch < 0)
+	{
+		FILE *f = fopen("gx_terrain_viewrect_off.txt", "r");
+		s_gxViewRectSwitch = f != nullptr ? 1 : 0;
+		if (f != nullptr)
+			fclose(f);
+		fprintf(stderr, "[GX-TERRAIN-VIEW] view rect %s\n", s_gxViewRectSwitch ? "OFF (gx_terrain_viewrect_off.txt): whole draw area"
+			: "on (shoreline / 3-way blend only where the camera looks; self-check once a second)");
+	}
+	return s_gxViewRectSwitch == 1 || s_gxViewRectFailed;
+}
+
 void BaseHeightMapRenderObjClass::gxSetViewRect(const CameraClass *camera)
 {
 	m_gxViewRectValid = FALSE;
 	if (camera == nullptr || m_map == nullptr || TheGlobalData == nullptr || TheGlobalData->m_isWorldBuilder)
+		return;
+	if (gxViewRectSwitchedOff())
 		return;
 	// Water reflection draws with inverted culling through a mirrored camera: keep the whole area there.
 	if (ShaderClass::Is_Backface_Culling_Inverted())
@@ -2519,6 +2543,86 @@ void BaseHeightMapRenderObjClass::gxSetViewRect(const CameraClass *camera)
 	m_gxViewX1 = cellOf(maxX) + 1 + tile;
 	m_gxViewY1 = cellOf(maxY) + 1 + tile;
 	m_gxViewRectValid = TRUE;
+}
+
+// The self-check (see the header): nine points of the tactical view -- corners, edge middles, centre -- picked on the
+// terrain the way the mouse picks, each of which must fall inside the rect. Client drawing only, read-only picking.
+void BaseHeightMapRenderObjClass::gxCheckViewRect()
+{
+	static std::chrono::steady_clock::time_point s_next;
+	static Int s_failsInARow = 0;
+	static Int s_logged = 0;
+	if (!m_gxViewRectValid || TheTacticalView == nullptr || m_map == nullptr)
+		return;
+	// Review 12204: only in a match -- a low shell-map camera must not switch the rect off for the whole session.
+	if (TheGameLogic == nullptr || !TheGameLogic->isInGame() || TheGameLogic->isInShellGame())
+		return;
+	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	if (now < s_next)
+		return;
+	s_next = now + std::chrono::seconds(1);
+	Int ox = 0, oy = 0;
+	TheTacticalView->getOrigin(&ox, &oy);
+	const Int w = TheTacticalView->getWidth();
+	const Int h = TheTacticalView->getHeight();
+	if (w <= 2 || h <= 2)
+		return;
+	const Int border = m_map->getBorderSizeInline();
+	// Review 12204: the pick ray reaches past the far plane and the map edge, where nothing is drawn; a point
+	// outside the draw area is no clip of anything on screen, so it is not counted.
+	const Int drawX0 = m_map->getDrawOrgX(), drawY0 = m_map->getDrawOrgY();
+	const Int drawX1 = drawX0 + m_map->getDrawWidth(), drawY1 = drawY0 + m_map->getDrawHeight();
+	Int outside = 0, picked = 0;
+	ICoord2D firstBad = { 0, 0 };
+	Coord3D firstBadWorld = { 0, 0, 0 };
+	for (Int iy = 0; iy < 3; ++iy)
+	{
+		for (Int ix = 0; ix < 3; ++ix)
+		{
+			ICoord2D screen;
+			screen.x = ox + (ix == 0 ? 0 : ix == 1 ? w / 2 : w - 1);
+			screen.y = oy + (iy == 0 ? 0 : iy == 1 ? h / 2 : h - 1);
+			Coord3D world;
+			if (!TheTacticalView->screenToTerrain(&screen, &world))
+				continue;	// sky or off the map: nothing drawn there
+			++picked;
+			const Int cx = (Int)floorf(world.x / MAP_XY_FACTOR) + border;
+			const Int cy = (Int)floorf(world.y / MAP_XY_FACTOR) + border;
+			if (cx < drawX0 || cx >= drawX1 || cy < drawY0 || cy >= drawY1)
+				continue;
+			if (cx < m_gxViewX0 || cx >= m_gxViewX1 || cy < m_gxViewY0 || cy >= m_gxViewY1)
+			{
+				if (outside == 0)
+				{
+					firstBad = screen;
+					firstBadWorld = world;
+				}
+				++outside;
+			}
+		}
+	}
+	if (outside == 0)
+	{
+		s_failsInARow = 0;
+		return;
+	}
+	++s_failsInARow;
+	if (s_logged < 10)
+	{
+		++s_logged;
+		fprintf(stderr, "[GX-TERRAIN-VIEW] self-check: %d of %d screen points outside the view rect [%d,%d)x[%d,%d) -- first at "
+			"screen %d,%d world %.0f,%.0f,%.0f (cell %d,%d); draw area org %d,%d size %dx%d%s\n",
+			outside, picked, m_gxViewX0, m_gxViewX1, m_gxViewY0, m_gxViewY1, firstBad.x, firstBad.y,
+			firstBadWorld.x, firstBadWorld.y, firstBadWorld.z,
+			(Int)floorf(firstBadWorld.x / MAP_XY_FACTOR) + border, (Int)floorf(firstBadWorld.y / MAP_XY_FACTOR) + border,
+			m_map->getDrawOrgX(), m_map->getDrawOrgY(), m_map->getDrawWidth(), m_map->getDrawHeight(),
+			s_failsInARow >= 2 ? " -> view rect OFF for this session" : "");
+	}
+	if (s_failsInARow >= 2)
+	{
+		s_gxViewRectFailed = TRUE;
+		m_gxViewRectValid = FALSE;
+	}
 }
 
 // Narrows a pass's [x0,xEdge) x [y0,yEdge) cell range to the view rectangle, when there is one.
