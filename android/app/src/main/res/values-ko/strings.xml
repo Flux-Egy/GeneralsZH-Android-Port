@@ -113,6 +113,11 @@
     <string name="setup_switch_touch_debug_desc">터치 계층의 상태를 게임 위에 표시합니다: 현재 제스처, 손가락 위치, 엔진이 포인터가 있다고 여기는 위치, 카메라 스크롤 기준점. 조작 문제를 보고할 때 켜세요 — 저절로 움직이는 지도, 엉뚱한 곳의 유령 건물, 누르지 않은 곳을 겨냥하는 능력. (gx_touch_debug.txt)</string>
     <string name="setup_switch_gx_perf">성능 요약</string>
     <string name="setup_switch_gx_perf_desc">프레임 시간이 어디에 쓰이는지(레이더, 오디오, 네트워크, 게임 로직, 렌더링) 매초 한 줄씩 짧게 추가합니다. 세션 내내 켜둬도 안전합니다 — FPS/버벅임 제보 시 켜세요. (gx_perf.txt)</string>
+    <string name="setup_switch_catchup_off">속도 따라잡기 끄기</string>
+    <string name="setup_switch_catchup_off_desc">오프라인 게임만: 그려지는 프레임마다 게임 로직은 최대 한 단계. 게임 속도를 따라가지 못하는 폰은 끊기는 대신 조금 느리게 진행됩니다. 일부 폰의 끊김 테스트용. (gx_speed_catchup_off.txt)</string>
+    <string name="setup_switch_viewrect_off">지형 최적화 끄기</string>
+    <string name="setup_switch_viewrect_off_desc">1.4.5 12202 이전처럼 해안선과 지형 블렌드를 맵 영역 전체에 다시 그립니다. 프레임 시간이 더 듭니다. 맵 위의 회색 안개 같은 그래픽 문제를 테스트할 때만 켜세요. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_diagnostics_disclaimer">테스트와 디버깅 용도로만 사용하세요. 성능에 영향을 줄 수 있습니다.</string>
     <string name="setup_switch_gpu_timer">GPU 프레임 시간 측정</string>
     <string name="setup_switch_gpu_timer_desc">GPU가 프레임마다 쓰는 시간을 측정해 성능 요약에 추가합니다. GPU와 CPU 중 무엇이 병목인지 알 수 있습니다. OpenGL ES 전용입니다. 일부 Mali 드라이버에서 충돌이 나므로 요청받은 경우에만 켜세요. (gx_gles_gputimer.txt)</string>
     <string name="setup_switch_gx_audio_trace">오디오 로그</string>

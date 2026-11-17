@@ -113,6 +113,11 @@
     <string name="setup_switch_touch_debug_desc">在游戏画面上绘制触摸层的状态：当前手势、手指位置、引擎认为指针所在的位置，以及镜头滚动锚点。报告操作问题时请开启——地图自行移动、幽灵建筑出现在错误位置、技能瞄准到你没有触摸的地方。(gx_touch_debug.txt)</string>
     <string name="setup_switch_gx_perf">性能摘要</string>
     <string name="setup_switch_gx_perf_desc">每秒添加一行简短记录，显示每帧时间花在哪里（雷达、音频、网络、游戏逻辑、渲染）。整个游玩会话保持开启也是安全的 —— 用于 FPS/卡顿报告时打开。(gx_perf.txt)</string>
+    <string name="setup_switch_catchup_off">关闭速度追帧</string>
+    <string name="setup_switch_catchup_off_desc">仅限离线对局：每绘制一帧最多执行一步游戏逻辑。跟不上游戏速度的手机会稍微变慢，而不是卡顿。用于测试部分手机上的卡顿。(gx_speed_catchup_off.txt)</string>
+    <string name="setup_switch_viewrect_off">关闭地形优化</string>
+    <string name="setup_switch_viewrect_off_desc">像 1.4.5 12202 之前那样，重新为整个地图区域绘制海岸线和地形混合层。会增加帧耗时；仅在测试图形问题（例如地图上出现灰色雾气）时打开。(gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_diagnostics_disclaimer">仅用于测试和调试，可能影响性能。</string>
     <string name="setup_switch_gpu_timer">GPU 帧耗时测量</string>
     <string name="setup_switch_gpu_timer_desc">测量 GPU 渲染每一帧的耗时并加入性能摘要，用于判断瓶颈在 GPU 还是 CPU。仅限 OpenGL ES。部分 Mali 驱动会因此崩溃，除非被要求，否则请保持关闭。(gx_gles_gputimer.txt)</string>
     <string name="setup_switch_gx_audio_trace">音频日志</string>

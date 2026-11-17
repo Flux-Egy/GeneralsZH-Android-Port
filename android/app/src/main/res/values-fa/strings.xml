@@ -113,6 +113,11 @@
     <string name="setup_switch_touch_debug_desc">وضعیت لایه لمسی را روی بازی می‌کشد: حرکت فعلی، جای انگشت شما، جایی که موتور بازی فکر می‌کند نشانگر است، و لنگر پیمایش دوربین. برای گزارش مشکلات کنترل این را روشن کنید — نقشه‌ای که خودش حرکت می‌کند، ساختمان شبح در جای اشتباه، توانایی که جایی را نشانه می‌رود که لمس نکرده‌اید. (gx_touch_debug.txt)</string>
     <string name="setup_switch_gx_perf">خلاصه عملکرد</string>
     <string name="setup_switch_gx_perf_desc">هر ثانیه یک خط کوتاه اضافه می‌کند که نشان می‌دهد زمان هر فریم صرف چه چیزی می‌شود (رادار، صدا، شبکه، منطق بازی، رندر). فعال نگه‌داشتن آن در کل نشست بازی بی‌خطر است — برای گزارش‌های FPS/کندی فعال کنید. (gx_perf.txt)</string>
+    <string name="setup_switch_catchup_off">خاموش کردن جبران سرعت</string>
+    <string name="setup_switch_catchup_off_desc">فقط بازی‌های آفلاین: حداکثر یک گام منطق بازی در هر فریم. گوشی‌ای که به سرعت بازی نمی‌رسد کمی کندتر بازی می‌کند به‌جای لگ زدن. برای آزمایش لگ روی بعضی گوشی‌ها. (gx_speed_catchup_off.txt)</string>
+    <string name="setup_switch_viewrect_off">خاموش کردن بهینه‌سازی زمین</string>
+    <string name="setup_switch_viewrect_off_desc">خط ساحل و ترکیب بافت‌های زمین را دوباره برای کل محدوده نقشه می‌کشد، مثل قبل از 1.4.5 12202. زمان فریم بیشتری می‌گیرد؛ فقط برای آزمایش یک مشکل گرافیکی مثل مه خاکستری روی نقشه روشنش کنید. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_diagnostics_disclaimer">فقط برای آزمایش و عیب‌یابی. ممکن است روی کارایی اثر بگذارد.</string>
     <string name="setup_switch_gpu_timer">اندازه‌گیری زمان پردازنده گرافیکی</string>
     <string name="setup_switch_gpu_timer_desc">مدت زمانی را که پردازنده گرافیکی برای هر فریم صرف می‌کند اندازه می‌گیرد و به خلاصه کارایی اضافه می‌کند تا معلوم شود محدودیت از پردازنده گرافیکی است یا پردازنده. فقط OpenGL ES. برخی درایورهای Mali با آن از کار می‌افتند، پس فقط در صورت درخواست روشنش کنید. (gx_gles_gputimer.txt)</string>
     <string name="setup_switch_gx_audio_trace">گزارش صدا</string>
