@@ -223,6 +223,39 @@ static void gxNoteTerrainRender(double tilesMs, double shoreMs, double blendMs, 
 }
 static std::chrono::steady_clock::time_point s_gxLightWindow = std::chrono::steady_clock::now();
 
+// GeneralsX @diagnostic Flux Build 17/11/2026 v1.4.5 12210 [GX-SHROUD] every 10 s with the perf trace (owner: unexplored
+// ground as bright as explored on GLES): how many shroud cells are unexplored / fogged / clear by their texel level
+// (the data the shroud pass multiplies the terrain by), and how many terrain renders ran the shroud pass. Data right
+// and the pass running, but no darkening on screen = the pass's depth test (see gles_pipeline invariant gl_Position).
+static Int s_gxShroudPasses = 0;
+static Int s_gxShroudRenders = 0;
+void HeightMapRenderObjClass::gxNoteShroud()
+{
+	static std::chrono::steady_clock::time_point s_window = std::chrono::steady_clock::now();
+	++s_gxShroudRenders;
+	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	if (now - s_window < std::chrono::seconds(10))
+		return;
+	s_window = now;
+	Int unexplored = 0, fogged = 0, clear = 0;
+	if (m_shroud != nullptr && TheGlobalData != nullptr)
+	{
+		const Int lo = (Int)TheGlobalData->m_shroudAlpha + 16;
+		const Int hi = (Int)TheGlobalData->m_clearAlpha - 16;
+		for (Int y = 0; y < m_shroud->getNumShroudCellsY(); ++y)
+			for (Int x = 0; x < m_shroud->getNumShroudCellsX(); ++x)
+			{
+				const Int level = (Int)m_shroud->getShroudLevel(x, y);
+				if (level <= lo) ++unexplored; else if (level < hi) ++fogged; else ++clear;
+			}
+	}
+	fprintf(stderr, "[GX-SHROUD] cells: unexplored %d, fogged %d, clear %d (levels %d/%d/%d) | shroud pass in %d of %d terrain renders\n",
+		unexplored, fogged, clear, TheGlobalData ? (Int)TheGlobalData->m_shroudAlpha : -1, TheGlobalData ? (Int)TheGlobalData->m_fogAlpha : -1,
+		TheGlobalData ? (Int)TheGlobalData->m_clearAlpha : -1, s_gxShroudPasses, s_gxShroudRenders);
+	s_gxShroudPasses = 0;
+	s_gxShroudRenders = 0;
+}
+
 //=============================================================================
 // HeightMapRenderObjClass::doTheDynamicLight
 //=============================================================================
@@ -2402,7 +2435,10 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 			rinfo.Peek_Additional_Pass(0)->Install_Materials();
 			renderTerrainPass(&rinfo.Camera);
 			rinfo.Peek_Additional_Pass(0)->UnInstall_Materials();
+			++s_gxShroudPasses; // GeneralsX 17/11/2026 12210 [GX-SHROUD]
 		}
+		if (gxPerf)
+			gxNoteShroud(); // GeneralsX @diagnostic Flux Build 17/11/2026 v1.4.5 12210 [GX-SHROUD]
 
 		ShaderClass::Invalidate();
 		DX8Wrapper::Apply_Render_State_Changes();

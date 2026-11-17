@@ -125,6 +125,12 @@
     <string name="setup_switch_gx_perf_desc">Добавляет одну короткую строку в секунду о том, куда уходит время кадра (радар, звук, сеть, игровая логика, рендер). Можно оставить включённым на всю сессию — включайте для отчётов о низком FPS/подтормаживаниях. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">Отключить оптимизацию ландшафта</string>
     <string name="setup_switch_viewrect_off_desc">Снова рисует береговые линии и смешивание ландшафта на всей области карты, как до 1.4.5 12202. Стоит времени кадра; включайте только для проверки графической проблемы, например серого тумана над картой. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">Отключить подсказки частоты CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">Игра сообщает Android 13 и новее, сколько длится каждый кадр, чтобы телефон держал её на быстрых ядрах с нужной частотой. Включайте только для сравнения. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">Отключить исправление глубины тумана</string>
+    <string name="setup_switch_noinvariant_desc">Отключает исправление из 12210, благодаря которому туман войны затемняет неразведанную и затуманенную местность в OpenGL ES. Только для сравнения скриншотов. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">Отключить адаптивное ограничение кадров</string>
+    <string name="setup_switch_adaptive_cap_off_desc">В офлайн-играх выше обычной скорости телефон, который не дотягивает до частоты кадров игры, удерживается на стабильных 60 для плавности и отпускается, когда появляется запас. Включайте только для сравнения. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Только для тестирования и отладки. Может снизить производительность.</string>
     <string name="setup_switch_gpu_timer">Замер времени видеокарты</string>
     <string name="setup_switch_gpu_timer_desc">Измеряет, сколько видеокарта тратит на каждый кадр, и добавляет это в сводку производительности — чтобы понять, что тормозит: видеокарта или процессор. Только для OpenGL ES. На некоторых драйверах Mali вызывает вылет, поэтому включайте, только если вас об этом попросили. (gx_gles_gputimer.txt)</string>

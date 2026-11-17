@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">Ajoute une courte ligne par seconde indiquant où passe le temps de trame (radar, audio, réseau, logique du jeu, rendu). Peut rester activé toute la session sans risque — activez-le pour les rapports de FPS/ralentissements. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">Désactiver l’optimisation du terrain</string>
     <string name="setup_switch_viewrect_off_desc">Redessine les rivages et les fondus du terrain sur toute la zone de la carte, comme avant 1.4.5 12202. Coûte du temps d’image ; à activer seulement pour tester un problème graphique, comme un brouillard gris sur la carte. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">Désactiver les indications de fréquence CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">Le jeu indique à Android 13 et plus la durée de chaque image, pour que le téléphone le garde sur des cœurs rapides à la fréquence nécessaire. À activer seulement pour comparer sans. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">Désactiver la correction de profondeur du brouillard</string>
+    <string name="setup_switch_noinvariant_desc">Désactive la correction de 12210 qui permet au brouillard de guerre d’assombrir le terrain inexploré et embrumé avec OpenGL ES. Seulement pour comparer des captures. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">Désactiver la limite adaptative d’images</string>
+    <string name="setup_switch_adaptive_cap_off_desc">Dans les parties hors ligne au-dessus de la vitesse normale, un téléphone qui n’atteint pas la fréquence du jeu est tenu à 60 stables pour un mouvement fluide, puis libéré quand il a de la marge. À activer seulement pour comparer. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Uniquement pour les tests et le débogage. Peut réduire les performances.</string>
     <string name="setup_switch_gpu_timer">Mesure du temps GPU</string>
     <string name="setup_switch_gpu_timer_desc">Mesure le temps que le GPU passe sur chaque image et l\'ajoute au résumé des performances, pour savoir si la limite vient du GPU ou du CPU. OpenGL ES uniquement. Certains pilotes Mali plantent avec, laissez-la désactivée sauf si on vous le demande. (gx_gles_gputimer.txt)</string>

@@ -682,3 +682,10 @@ extern "C" void d3d8gles_write_crash_context(void (*out)(const char *, size_t), 
 		out(kEnd, sizeof(kEnd) - 1);
 	}
 }
+
+// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12210 The render thread's id, for the CPU clock hints
+// (Core/GameEngine/Include/Common/GXCpuHint.h, a weak reference: 0 until the thread runs, or without this library).
+extern "C" int d3d8gles_render_thread_tid()
+{
+	return (int)gxrt::s_workerTid;
+}

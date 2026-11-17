@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">Dodaje jedną krótką linię na sekundę pokazującą, na co idzie czas klatki (radar, dźwięk, sieć, logika gry, renderowanie). Można bezpiecznie zostawić włączone przez całą sesję — włącz do zgłoszeń o FPS/spowolnieniach. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">Wyłącz optymalizację terenu</string>
     <string name="setup_switch_viewrect_off_desc">Znowu rysuje linie brzegowe i przejścia terenu na całym obszarze mapy, jak przed 1.4.5 12202. Kosztuje czas klatki; włącz tylko do testu problemu z grafiką, np. szarej mgły nad mapą. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">Wyłącz podpowiedzi taktowania CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">Gra mówi Androidowi 13 i nowszemu, ile trwa każda klatka, aby telefon trzymał ją na szybkich rdzeniach z potrzebnym taktowaniem. Włącz tylko do porównania. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">Wyłącz poprawkę głębi mgły</string>
+    <string name="setup_switch_noinvariant_desc">Wyłącza poprawkę z 12210, dzięki której mgła wojny przyciemnia niezbadany i zamglony teren w OpenGL ES. Tylko do porównywania zrzutów ekranu. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">Wyłącz adaptacyjny limit klatek</string>
+    <string name="setup_switch_adaptive_cap_off_desc">W grach offline powyżej normalnej prędkości telefon, który nie osiąga liczby klatek gry, jest trzymany na stałych 60 dla płynnego ruchu i zwalniany, gdy ma zapas. Włącz tylko do porównania. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Tylko do testów i debugowania. Może obniżyć wydajność.</string>
     <string name="setup_switch_gpu_timer">Pomiar czasu GPU</string>
     <string name="setup_switch_gpu_timer_desc">Mierzy, ile czasu GPU poświęca na każdą klatkę, i dodaje to do podsumowania wydajności — by sprawdzić, czy ogranicza GPU czy CPU. Tylko OpenGL ES. Niektóre sterowniki Mali się z tym wysypują, więc włączaj tylko na prośbę. (gx_gles_gputimer.txt)</string>

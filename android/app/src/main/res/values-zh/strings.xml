@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">每秒添加一行简短记录，显示每帧时间花在哪里（雷达、音频、网络、游戏逻辑、渲染）。整个游玩会话保持开启也是安全的 —— 用于 FPS/卡顿报告时打开。(gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">关闭地形优化</string>
     <string name="setup_switch_viewrect_off_desc">像 1.4.5 12202 之前那样，重新为整个地图区域绘制海岸线和地形混合层。会增加帧耗时；仅在测试图形问题（例如地图上出现灰色雾气）时打开。(gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">关闭 CPU 频率提示</string>
+    <string name="setup_switch_cpu_hints_off_desc">游戏会告诉 Android 13 及以上系统每帧耗时，让手机以所需速度在大核上运行游戏。仅在对比时打开。(gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">关闭迷雾深度修复</string>
+    <string name="setup_switch_noinvariant_desc">关闭 12210 的修复（该修复让战争迷雾在 OpenGL ES 下使未探索和迷雾区域变暗）。仅用于对比截图。(gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">关闭自适应帧率限制</string>
+    <string name="setup_switch_adaptive_cap_off_desc">在高于正常速度的离线对局中，达不到游戏帧率的手机会被稳定在 60 帧以保持流畅，有余量时再解除。仅在对比时打开。(gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">仅用于测试和调试，可能影响性能。</string>
     <string name="setup_switch_gpu_timer">GPU 帧耗时测量</string>
     <string name="setup_switch_gpu_timer_desc">测量 GPU 渲染每一帧的耗时并加入性能摘要，用于判断瓶颈在 GPU 还是 CPU。仅限 OpenGL ES。部分 Mali 驱动会因此崩溃，除非被要求，否则请保持关闭。(gx_gles_gputimer.txt)</string>

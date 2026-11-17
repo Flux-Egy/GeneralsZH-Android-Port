@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">Añade una línea corta por segundo mostrando en qué se gasta el tiempo de cuadro (radar, audio, red, lógica del juego, renderizado). Seguro dejarlo activado toda la sesión — actívalo para informes de FPS/ralentización. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">Desactivar la optimización del terreno</string>
     <string name="setup_switch_viewrect_off_desc">Vuelve a dibujar las orillas y las mezclas del terreno en toda el área del mapa, como antes de 1.4.5 12202. Cuesta tiempo de fotograma; actívalo solo para probar un problema gráfico, como una niebla gris sobre el mapa. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">Desactivar las indicaciones de reloj de CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">El juego le dice a Android 13 o superior cuánto tarda cada fotograma, para que el móvil lo mantenga en núcleos rápidos a la velocidad que necesita. Actívalo solo para comparar sin ellas. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">Desactivar la corrección de profundidad de la niebla</string>
+    <string name="setup_switch_noinvariant_desc">Desactiva la corrección de 12210 que permite que la niebla de guerra oscurezca el terreno inexplorado y en niebla con OpenGL ES. Solo para comparar capturas. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">Desactivar el límite adaptativo de FPS</string>
+    <string name="setup_switch_adaptive_cap_off_desc">En partidas sin conexión por encima de la velocidad normal, un móvil que no alcanza los FPS del juego se mantiene en 60 estables para un movimiento fluido, y se libera cuando vuelve a tener margen. Actívalo solo para comparar. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Solo para pruebas y depuración. Puede afectar al rendimiento.</string>
     <string name="setup_switch_gpu_timer">Medición de tiempo de GPU</string>
     <string name="setup_switch_gpu_timer_desc">Mide cuánto tarda la GPU en cada fotograma y lo añade al resumen de rendimiento, para saber si el límite es la GPU o la CPU. Solo OpenGL ES. Algunos controladores Mali se bloquean con ella; déjala desactivada salvo que te lo pidan. (gx_gles_gputimer.txt)</string>

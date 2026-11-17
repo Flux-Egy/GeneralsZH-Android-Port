@@ -19,9 +19,12 @@
 
 #include "Common/FramePacer.h"
 #include "Common/GXRenderLimit.h"
+#include "Common/GXCpuHint.h" // GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12210
+#include "Common/GXAdaptiveCap.h" // GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12210
 #include <chrono>
 #include <cstdio>
 
+#include "Common/GlobalData.h"
 #include "GameClient/View.h"
 
 #include "GameLogic/GameLogic.h"
@@ -63,8 +66,32 @@ void FramePacer::update()
 {
 	// TheSuperHackers @bugfix xezon 05/08/2025 Re-implements the frame rate limiter
 	// with higher resolution counters to cap the frame rate more accurately to the desired limit.
+#if defined(__ANDROID__)
+	UnsignedInt maxFps = getActualFramesPerSecondLimit();
+	// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12210 This frame's work on the engine's thread -- from the end
+	// of the last limiter wait to now -- for the adaptive frame cap (GXAdaptiveCap.h: an offline game that misses its
+	// limit is drawn at a steady 60) and the CPU clock hints (GXCpuHint.h: the target is the limit actually used).
+	// Only how long the limiter sleeps changes: no logic, CRC or network.
+	static std::chrono::steady_clock::time_point s_gxWorkStart;
+	static Bool s_gxHaveWorkStart = FALSE;
+	const std::chrono::steady_clock::time_point gxNow = std::chrono::steady_clock::now();
+	const std::chrono::steady_clock::duration gxWork = s_gxHaveWorkStart ? gxNow - s_gxWorkStart : std::chrono::steady_clock::duration::zero();
+	const Bool gxWorldBuilder = TheGlobalData != nullptr && TheGlobalData->m_isWorldBuilder;
+	const Bool gxOffline = !gxWorldBuilder && TheGameLogic != nullptr && TheNetwork == nullptr
+		&& TheGameLogic->isInGame() && !TheGameLogic->isInShellGame() && !TheGameLogic->isInReplayGame()
+		&& (TheGameLogic->isInSkirmishGame() || TheGameLogic->isInSinglePlayerGame());
+	maxFps = GXAdaptiveCap::apply(maxFps, gxOffline,
+		s_gxHaveWorkStart ? std::chrono::duration<double, std::milli>(gxWork).count() : -1.0);
+	if (s_gxHaveWorkStart && !gxWorldBuilder) // review 12210: no hints in World Builder (no game-folder switch there)
+		GXCpuHint::frame(gxWork, maxFps);
+#else
 	const UnsignedInt maxFps = getActualFramesPerSecondLimit();// allowFpsLimit ? getFramesPerSecondLimit() : RenderFpsPreset::UncappedFpsValue;
+#endif
 	m_updateTime = m_frameRateLimit.wait(maxFps);
+#if defined(__ANDROID__)
+	s_gxWorkStart = std::chrono::steady_clock::now();
+	s_gxHaveWorkStart = TRUE;
+#endif
 #if defined(__ANDROID__)
 	// GeneralsX @diagnostic Flux Build 11/11/2026 [GX-FPS] every 5 s: the limit, whether it is enforced (and
 	// why not), and the measured rate -- shows at once why a game ran above the launcher's limit.

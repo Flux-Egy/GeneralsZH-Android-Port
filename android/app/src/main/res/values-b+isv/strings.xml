@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">Dodaje odnu kratku liniju na sekundu, kotora pokazuje kde ide vrěmě kadra (radar, zvuk, sěť, logika igry, renderovanje). Bezpečno ostaviti uklopjeno za cělu sesiju igry — uklopte za izvěšćenja o FPS/zapovolnjenjih. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">Izključiti optimizaciju terena</string>
     <string name="setup_switch_viewrect_off_desc">Znovu risuje bregove linije i směšanje terena na cělom prostoru karty, kako pred 1.4.5 12202. Kosta vrěme kadra; vključite jedino za testovanje grafičnogo problema, napriklad sivoj mgly nad kartoju. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">Izključiti napovědi o brzině CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">Igra kaže Androidu 13 i novějim, koliko trvaje každy kadr, i telefon drži igru na brzyh jedrah s potrěbnoju brzinoju. Vključite jedino za srovnanje bez togo. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">Izključiti popravku glubiny zavěsy</string>
+    <string name="setup_switch_noinvariant_desc">Izključaje popravku 12210, ktora dozvoljaje mgle vojny zatemniti neizslědovanu i zamglenu zemlju v OpenGL ES. Jedino za srovnanje snimkov. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">Izključiti prisposobny limit kadrov</string>
+    <string name="setup_switch_adaptive_cap_off_desc">V igrah bez mreže nad normalnoju brzinoju telefon, ktory ne dosěgaje čislo kadrov igry, se drži na stabilnyh 60 za gladko dviženje, i se pušča, kogda imaje zapas. Vključite jedino za srovnanje. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Jedino za testovanje i iskanje grěšek. Može vplivati na učinnost.</string>
     <string name="setup_switch_gpu_timer">Měrjenje časa GPU</string>
     <string name="setup_switch_gpu_timer_desc">Měri, koliko časa GPU trati na každy kadr, i dodaje to k svodu produktivnosti — da by bylo vidno, čto ograničaje: GPU ili CPU. Jedino OpenGL ES. Někoje drajvery Mali s tym padajut, zato vključajte jedino, ako vas o tom poprosili. (gx_gles_gputimer.txt)</string>

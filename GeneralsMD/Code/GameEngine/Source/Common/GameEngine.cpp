@@ -47,6 +47,7 @@
 #include "Common/GXPerfGuard.h"
 #include "Common/GXLifecycle.h"
 #include "Common/GXLogicPerf.h" // GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 [GX-PERF-LOGIC]
+#include "Common/GXAdaptiveCap.h" // GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12210
 #include "Common/GameEngine.h"
 #include "Common/GXReplayCheck.h"
 #include "Common/INI.h"
@@ -1147,7 +1148,16 @@ Bool GameEngine::canUpdateNetworkGameLogic()
 Bool GameEngine::canUpdateRegularGameLogic(UnsignedInt logicTimeQueryFlags)
 {
 	const Int logicTimeScaleFps = TheFramePacer->getActualLogicTimeScaleFps(logicTimeQueryFlags);
+#if defined(__ANDROID__)
+	// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12210 review: while the adaptive frame cap draws an offline game
+	// at 60 (GXAdaptiveCap.h), pace the logic by that limit too -- the frames really come at 60, and the accumulator path
+	// below would drop the time of every frame over 1/60 s. Offline only (the cap is); same frames in the same order.
+	Int maxRenderFps = TheFramePacer->getActualFramesPerSecondLimit();
+	if (GXAdaptiveCap::capped() && maxRenderFps > (Int)GXAdaptiveCap::CAP_FPS)
+		maxRenderFps = (Int)GXAdaptiveCap::CAP_FPS;
+#else
 	const Int maxRenderFps = TheFramePacer->getActualFramesPerSecondLimit();
+#endif
 
 #if defined(_ALLOW_DEBUG_CHEATS_IN_RELEASE)
 	const Bool useFastMode = TheGlobalData->m_TiVOFastMode;

@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">프레임 시간이 어디에 쓰이는지(레이더, 오디오, 네트워크, 게임 로직, 렌더링) 매초 한 줄씩 짧게 추가합니다. 세션 내내 켜둬도 안전합니다 — FPS/버벅임 제보 시 켜세요. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">지형 최적화 끄기</string>
     <string name="setup_switch_viewrect_off_desc">1.4.5 12202 이전처럼 해안선과 지형 블렌드를 맵 영역 전체에 다시 그립니다. 프레임 시간이 더 듭니다. 맵 위의 회색 안개 같은 그래픽 문제를 테스트할 때만 켜세요. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">CPU 클럭 힌트 끄기</string>
+    <string name="setup_switch_cpu_hints_off_desc">게임이 Android 13 이상에 프레임마다 걸리는 시간을 알려, 폰이 게임을 필요한 속도로 빠른 코어에서 실행하게 합니다. 비교할 때만 켜세요. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">안개 깊이 수정 끄기</string>
+    <string name="setup_switch_noinvariant_desc">OpenGL ES에서 전장의 안개가 미탐색 및 안개 지역을 어둡게 하도록 한 12210 수정을 끕니다. 스크린샷 비교용입니다. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">적응형 프레임 제한 끄기</string>
+    <string name="setup_switch_adaptive_cap_off_desc">보통보다 빠른 속도의 오프라인 게임에서 게임 프레임을 따라가지 못하는 폰은 부드러운 움직임을 위해 60으로 고정되고, 여유가 생기면 다시 풀립니다. 비교할 때만 켜세요. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">테스트와 디버깅 용도로만 사용하세요. 성능에 영향을 줄 수 있습니다.</string>
     <string name="setup_switch_gpu_timer">GPU 프레임 시간 측정</string>
     <string name="setup_switch_gpu_timer_desc">GPU가 프레임마다 쓰는 시간을 측정해 성능 요약에 추가합니다. GPU와 CPU 중 무엇이 병목인지 알 수 있습니다. OpenGL ES 전용입니다. 일부 Mali 드라이버에서 충돌이 나므로 요청받은 경우에만 켜세요. (gx_gles_gputimer.txt)</string>

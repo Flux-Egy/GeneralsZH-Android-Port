@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">Додає один короткий рядок на секунду про те, куди йде час кадру (радар, звук, мережа, логіка гри, рендеринг). Можна безпечно залишити увімкненим на всю сесію — вмикайте для звітів про FPS/просідання. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">Вимкнути оптимізацію ландшафту</string>
     <string name="setup_switch_viewrect_off_desc">Знову малює берегові лінії та змішування ландшафту на всій області мапи, як до 1.4.5 12202. Коштує часу кадру; вмикайте лише для перевірки графічної проблеми, наприклад сірого туману над мапою. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">Вимкнути підказки частоти CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">Гра повідомляє Android 13 і новішим, скільки триває кожен кадр, щоб телефон тримав її на швидких ядрах з потрібною частотою. Вмикайте лише для порівняння. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">Вимкнути виправлення глибини туману</string>
+    <string name="setup_switch_noinvariant_desc">Вимикає виправлення з 12210, завдяки якому туман війни затемнює нерозвідану та затуманену місцевість в OpenGL ES. Лише для порівняння знімків екрана. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">Вимкнути адаптивне обмеження кадрів</string>
+    <string name="setup_switch_adaptive_cap_off_desc">В офлайн-іграх вище звичайної швидкості телефон, що не досягає частоти кадрів гри, тримається на стабільних 60 для плавності й відпускається, коли з’являється запас. Вмикайте лише для порівняння. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Лише для тестування та налагодження. Може знизити продуктивність.</string>
     <string name="setup_switch_gpu_timer">Замір часу відеокарти</string>
     <string name="setup_switch_gpu_timer_desc">Вимірює, скільки відеокарта витрачає на кожен кадр, і додає це до зведення продуктивності — щоб зрозуміти, що гальмує: відеокарта чи процесор. Лише для OpenGL ES. На деяких драйверах Mali спричиняє виліт, тож вмикайте, лише якщо вас про це попросили. (gx_gles_gputimer.txt)</string>

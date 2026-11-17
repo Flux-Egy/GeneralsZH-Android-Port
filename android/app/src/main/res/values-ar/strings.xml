@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">بيضيف سطر قصير كل ثانية بيوضح الوقت بيروح فين في كل فريم (الرادار، الصوت، الشبكة، منطق اللعبة، الرسم). عادي تسيبه شغال طول اللعب — شغّله لو هتبلّغ عن FPS أو بطء. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">إيقاف تحسين الـ Terrain</string>
     <string name="setup_switch_viewrect_off_desc">بيرسم طبقات الشط والـ blend بتاعة الأرض لمنطقة الخريطة كلها زي ما كان قبل 1.4.5 12202. بياخد من الـ FPS؛ شغّله بس عشان تجرب مشكلة رسوميات زي ضباب رمادي على الخريطة. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">إيقاف تلميحات سرعة الـ CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">اللعبة بتقول لأندرويد 13 وأحدث كل فريم بياخد قد إيه، فالموبايل يشغّلها على الأنوية السريعة بالسرعة اللي محتاجاها. شغّله بس عشان تقارن من غيره. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">إيقاف إصلاح عمق الـ Shroud</string>
+    <string name="setup_switch_noinvariant_desc">بيوقف إصلاح 12210 اللي بيخلّي الـ fog of war يغمّق الأرض اللي لسه ما اتكشفتش أو اللي عليها fog في OpenGL ES. بس للمقارنة بين الصور. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">إيقاف الـ Adaptive frame cap</string>
+    <string name="setup_switch_adaptive_cap_off_desc">في الألعاب الأوفلاين بسرعة أعلى من العادي، الموبايل اللي مش قادر يوصل لـ FPS اللعبة بيتثبّت على 60 عشان الحركة تبقى ناعمة، ويتساب تاني لما يبقى فيه مساحة. شغّله بس عشان تقارن من غيره. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">للتجربة وتتبّع المشاكل بس. ممكن يأثر على الأداء.</string>
     <string name="setup_switch_gpu_timer">وقت كارت الشاشة لكل فريم</string>
     <string name="setup_switch_gpu_timer_desc">بيقيس كارت الشاشة بياخد قد إيه في كل فريم ويضيفه لملخص الأداء، عشان نعرف المشكلة من كارت الشاشة ولا من المعالج. لـ OpenGL ES بس. بعض تعريفات Mali بتقفل فجأة معاه، فسيبه مقفول إلا لو حد طلبه منك. (gx_gles_gputimer.txt)</string>

@@ -1123,6 +1123,21 @@ static std::string combinerOp(unsigned op, const std::string &a0, const std::str
 	return buf;
 }
 
+// GeneralsX @bugfix Flux Build 17/11/2026 v1.4.5 12210 See the vertex shader's "invariant gl_Position" below.
+static bool gxInvariantPosition()
+{
+	static int s_state = -1;
+	if (s_state < 0) {
+		FILE *f = fopen("gx_gles_noinvariant.txt", "r");
+		s_state = f != nullptr ? 0 : 1;
+		if (f != nullptr)
+			fclose(f);
+		fprintf(stderr, "[d3d8gles] invariant gl_Position: %s\n", s_state ? "on (multi-pass depth EQUAL, e.g. the shroud)"
+			: "OFF (gx_gles_noinvariant.txt)");
+	}
+	return s_state == 1;
+}
+
 static GLuint compileShader(GLenum type, const std::string &src)
 {
 	GLuint sh = glCreateShader(type);
@@ -1247,6 +1262,15 @@ WebGLPipeline::ProgramInfo *WebGLPipeline::getProgram(WebGLDevice *dev, unsigned
 	// ---------------- vertex shader ----------------
 	std::string vs;
 	vs += "#version 300 es\nprecision highp float;\n";
+	// GeneralsX @bugfix Flux Build 17/11/2026 v1.4.5 12210 Shroud darkness (owner screenshot: unexplored ground as
+	// bright as explored). The shroud is a second terrain pass drawn with ZFUNC EQUAL (W3DShaderManager
+	// ShroudTextureShader); it only lands where its depth equals the first pass's to the bit. D3D guarantees that
+	// for the same vertices and matrices; GLSL ES does not across two different programs (the shroud pass's has
+	// texgen, the terrain's has not) unless gl_Position is declared invariant -- Adreno's compiler rounds them
+	// differently and the EQUAL test drops the shroud. Every generated program gets it, so every multi-pass draw
+	// computes the same depth. gx_gles_noinvariant.txt (game folder) leaves it out, for an A/B.
+	if (gxInvariantPosition())
+		vs += "invariant gl_Position;\n";
 	vs += l.xyzrhw ? "layout(location=0) in vec4 aPos;\n" : "layout(location=0) in vec3 aPos;\n";
 	if (l.hasNormal) vs += "layout(location=1) in vec3 aNormal;\n";
 	if (l.hasDiffuse) vs += "layout(location=2) in vec4 aColor0;\n";

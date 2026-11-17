@@ -128,6 +128,12 @@
     <string name="setup_switch_gx_perf_desc">Adds one short line per second showing where frame time goes (radar, audio, network, game logic, rendering). Safe to leave on for a whole play session — turn this on for FPS/slowdown reports. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">Disable terrain optimization</string>
     <string name="setup_switch_viewrect_off_desc">Draws the shoreline and terrain blend layers for the whole map area again, as before 1.4.5 12202. Costs frame time; turn on only to test a graphics problem such as a grey fog over the map. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">Disable CPU clock hints</string>
+    <string name="setup_switch_cpu_hints_off_desc">The game tells Android 13 and newer how long each frame takes, so the phone keeps the game on fast cores at the speed it needs. Turn on only to compare without it. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">Disable shroud depth fix</string>
+    <string name="setup_switch_noinvariant_desc">Turns off the 12210 fix that lets the fog of war darken unexplored and fogged ground with OpenGL ES. Only for comparing screenshots. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">Disable adaptive frame cap</string>
+    <string name="setup_switch_adaptive_cap_off_desc">In offline games above normal speed, a phone that cannot reach the game\'s frame rate is held at a steady 60 for smooth motion, and released when it has room again. Turn on only to compare without it. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">For testing and debugging purposes only. May impact performance.</string>
     <string name="setup_switch_gpu_timer">GPU frame timing</string>
     <string name="setup_switch_gpu_timer_desc">Measures how long the GPU spends on each frame and adds it to the performance summary, to tell whether the GPU or the CPU is the limit. OpenGL ES only. Some Mali drivers crash with it, so leave it off unless you are asked for it. (gx_gles_gputimer.txt)</string>

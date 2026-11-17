@@ -119,6 +119,7 @@ protected:
 	virtual Int	getNumExtraBlendTiles(Bool visible) override { return visible?m_numVisibleExtraBlendTiles:m_numExtraBlendTiles;}
 	void freeIndexVertexBuffers();
 	void renderExtraBlendTiles();	///< render 3-way blend tiles that have blend of 3 textures.
+	void gxNoteShroud();	///< GeneralsX @diagnostic Flux Build 17/11/2026 v1.4.5 12210 [GX-SHROUD]
 
 	// GeneralsX @performance Flux Build 09/11/2026 Terrain relighting and drawing for the tiles in view.
 	// Community logs 09/11: 9-38 MB of terrain vertices rewritten and uploaded per frame on maps with

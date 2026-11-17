@@ -115,6 +115,12 @@
     <string name="setup_switch_gx_perf_desc">هر ثانیه یک خط کوتاه اضافه می‌کند که نشان می‌دهد زمان هر فریم صرف چه چیزی می‌شود (رادار، صدا، شبکه، منطق بازی، رندر). فعال نگه‌داشتن آن در کل نشست بازی بی‌خطر است — برای گزارش‌های FPS/کندی فعال کنید. (gx_perf.txt)</string>
     <string name="setup_switch_viewrect_off">خاموش کردن بهینه‌سازی زمین</string>
     <string name="setup_switch_viewrect_off_desc">خط ساحل و ترکیب بافت‌های زمین را دوباره برای کل محدوده نقشه می‌کشد، مثل قبل از 1.4.5 12202. زمان فریم بیشتری می‌گیرد؛ فقط برای آزمایش یک مشکل گرافیکی مثل مه خاکستری روی نقشه روشنش کنید. (gx_terrain_viewrect_off.txt)</string>
+    <string name="setup_switch_cpu_hints_off">خاموش کردن راهنمای فرکانس CPU</string>
+    <string name="setup_switch_cpu_hints_off_desc">بازی به اندروید ۱۳ و جدیدتر می‌گوید هر فریم چقدر طول می‌کشد تا گوشی بازی را روی هسته‌های سریع با سرعت لازم اجرا کند. فقط برای مقایسه روشن کنید. (gx_cpu_hints_off.txt)</string>
+    <string name="setup_switch_noinvariant">خاموش کردن اصلاح عمق مه جنگ</string>
+    <string name="setup_switch_noinvariant_desc">اصلاح 12210 را خاموش می‌کند که باعث می‌شود مه جنگ زمین کشف‌نشده و مه‌آلود را در OpenGL ES تیره کند. فقط برای مقایسه اسکرین‌شات‌ها. (gx_gles_noinvariant.txt)</string>
+    <string name="setup_switch_adaptive_cap_off">خاموش کردن محدودیت تطبیقی فریم</string>
+    <string name="setup_switch_adaptive_cap_off_desc">در بازی‌های آفلاین با سرعت بالاتر از عادی، گوشی‌ای که به نرخ فریم بازی نمی‌رسد برای حرکت نرم روی ۶۰ ثابت نگه داشته می‌شود و وقتی جا داشت آزاد می‌شود. فقط برای مقایسه روشن کنید. (gx_adaptive_cap_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">فقط برای آزمایش و عیب‌یابی. ممکن است روی کارایی اثر بگذارد.</string>
     <string name="setup_switch_gpu_timer">اندازه‌گیری زمان پردازنده گرافیکی</string>
     <string name="setup_switch_gpu_timer_desc">مدت زمانی را که پردازنده گرافیکی برای هر فریم صرف می‌کند اندازه می‌گیرد و به خلاصه کارایی اضافه می‌کند تا معلوم شود محدودیت از پردازنده گرافیکی است یا پردازنده. فقط OpenGL ES. برخی درایورهای Mali با آن از کار می‌افتند، پس فقط در صورت درخواست روشنش کنید. (gx_gles_gputimer.txt)</string>
