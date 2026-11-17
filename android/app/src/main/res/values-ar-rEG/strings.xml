@@ -99,8 +99,6 @@
     <string name="setup_switch_touch_debug_desc">بيرسم حالة اللمس فوق اللعبة: الحركة الحالية، صباعك فين، الإنجن فاكر المؤشر فين، ومرساة تحريك الكاميرا. شغّله عشان تبلّغ عن مشاكل التحكم — الخريطة بتجري لوحدها، مبنى شبح في مكان غلط، قدرة بتنشّن في حتة انت مالمستهاش. (gx_touch_debug.txt)</string>
     <string name="setup_switch_gx_perf">ملخص الأداء</string>
     <string name="setup_switch_gx_perf_desc">بيضيف سطر قصير كل ثانية بيقول وقت الفريم بيروح فين (الرادار، الصوت، النت، منطق اللعبة، الرسم). ممكن تسيبه شغال طول اللعب — شغّله لبلاغات الـ FPS والتقل. (gx_perf.txt)</string>
-    <string name="setup_switch_catchup_off">إيقاف الـ Speed catch-up</string>
-    <string name="setup_switch_catchup_off_desc">في الألعاب الأوفلاين بس: خطوة logic واحدة بالكتير لكل فريم، فالموبايل اللي مش قادر يلحق الـ Game Speed هيلعب أبطأ شوية بدل ما يقطّع. للتجربة على الموبايلات اللي فيها تقطيع. (gx_speed_catchup_off.txt)</string>
     <string name="setup_switch_viewrect_off">إيقاف تحسين الـ Terrain</string>
     <string name="setup_switch_viewrect_off_desc">بيرسم طبقات الشط والـ blend بتاعة الأرض لمنطقة الخريطة كلها زي ما كان قبل 1.4.5 12202. بياخد من الـ FPS؛ شغّله بس عشان تجرب مشكلة رسوميات زي ضباب رمادي على الخريطة. (gx_terrain_viewrect_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">للتجربة وتتبّع المشاكل بس. ممكن يأثر على الأداء.</string>

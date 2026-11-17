@@ -10,7 +10,7 @@
 
 | Branch | Version | Highlights |
 |---|---|---|
-| `v1.4.5-community` | 1.4.5 (12206) | ONA-style on-screen controls with an in-game editor and profile import/export, cursor colour from the launcher and a 1.5x cursor, 2 s end-of-match wait, terrain passes limited to the camera view (Contra X performance), separate Zero Hour / Generals map imports with multi-delete; diagnostic build: terrain view self-check and A/B switch, logic and thread timing, speed catch-up switch, with Settings > Diagnostics switches for them |
+| `v1.4.5-community` | 1.4.5 (12208) | ONA-style on-screen controls with an in-game editor and profile import/export, cursor colour from the launcher and a 1.5x cursor, 2 s end-of-match wait, terrain passes limited to the camera view (Contra X performance), separate Zero Hour / Generals map imports with multi-delete; speed catch-up off by default (smoother on phones that cannot draw the chosen game speed), terrain-view self-check and a Diagnostics switch for it |
 | `v1.4.4-community` | 1.4.4 (12187) | [Android] lobbies, no Performance Guard kicks, fixed “i” and “G” buttons, Ctrl+number fix, mouse edge scrolling, keys on the loading screen, frame limiter |
 | `v1.4.2-community` | 1.4.2 (12162) | Logic Time Scale render rate, tag-free CRC, adaptive GSR, hitch fixes, Size/Opacity sliders |
 | `v1.4.1-community` | 1.4.1 (12157) | Native World Builder, Windowed mode (black bars), custom resolutions |

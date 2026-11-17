@@ -113,8 +113,6 @@
     <string name="setup_switch_touch_debug_desc">Desenha sobre o jogo o estado da camada de toque: gesto atual, onde está seu dedo, onde o motor acha que o ponteiro está e a âncora de rolagem da câmera. Ative isto para relatar problemas de controle — mapa que rola sozinho, construção fantasma no lugar errado, habilidade mirando onde você não tocou. (gx_touch_debug.txt)</string>
     <string name="setup_switch_gx_perf">Resumo de desempenho</string>
     <string name="setup_switch_gx_perf_desc">Adiciona uma linha curta por segundo mostrando para onde vai o tempo de quadro (radar, áudio, rede, lógica do jogo, renderização). Seguro deixar ativado durante toda a sessão — ative para relatos de FPS/lentidão. (gx_perf.txt)</string>
-    <string name="setup_switch_catchup_off">Desativar a recuperação de velocidade</string>
-    <string name="setup_switch_catchup_off_desc">Só partidas offline: no máximo um passo de lógica por quadro desenhado. Um celular que não acompanha a velocidade do jogo joga um pouco mais devagar em vez de travar. Para testar travadas em alguns celulares. (gx_speed_catchup_off.txt)</string>
     <string name="setup_switch_viewrect_off">Desativar a otimização do terreno</string>
     <string name="setup_switch_viewrect_off_desc">Volta a desenhar as margens e as misturas do terreno em toda a área do mapa, como antes da 1.4.5 12202. Custa tempo de quadro; ative só para testar um problema gráfico, como uma névoa cinza sobre o mapa. (gx_terrain_viewrect_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Somente para testes e depuração. Pode afetar o desempenho.</string>

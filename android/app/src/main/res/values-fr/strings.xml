@@ -113,8 +113,6 @@
     <string name="setup_switch_touch_debug_desc">Affiche par-dessus le jeu l\'état de la couche tactile : geste en cours, position de votre doigt, position où le moteur croit que se trouve le pointeur, et ancre de défilement de la caméra. Activez ceci pour signaler des problèmes de contrôle : carte qui défile toute seule, bâtiment fantôme au mauvais endroit, capacité qui vise là où vous n\'avez pas touché. (gx_touch_debug.txt)</string>
     <string name="setup_switch_gx_perf">Résumé des performances</string>
     <string name="setup_switch_gx_perf_desc">Ajoute une courte ligne par seconde indiquant où passe le temps de trame (radar, audio, réseau, logique du jeu, rendu). Peut rester activé toute la session sans risque — activez-le pour les rapports de FPS/ralentissements. (gx_perf.txt)</string>
-    <string name="setup_switch_catchup_off">Désactiver le rattrapage de vitesse</string>
-    <string name="setup_switch_catchup_off_desc">Parties hors ligne uniquement : au plus une étape de logique par image affichée. Un téléphone qui ne suit pas la vitesse du jeu joue alors un peu plus lentement au lieu de saccader. Pour tester les saccades sur certains téléphones. (gx_speed_catchup_off.txt)</string>
     <string name="setup_switch_viewrect_off">Désactiver l’optimisation du terrain</string>
     <string name="setup_switch_viewrect_off_desc">Redessine les rivages et les fondus du terrain sur toute la zone de la carte, comme avant 1.4.5 12202. Coûte du temps d’image ; à activer seulement pour tester un problème graphique, comme un brouillard gris sur la carte. (gx_terrain_viewrect_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">Uniquement pour les tests et le débogage. Peut réduire les performances.</string>

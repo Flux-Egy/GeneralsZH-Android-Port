@@ -126,8 +126,6 @@
     <string name="setup_switch_touch_debug_desc">Draws the touch layer\'s own state over the game: current gesture, where your finger is, where the engine thinks the pointer is, and the camera scroll anchor. Turn this on to report control problems — a runaway map, a ghost building in the wrong place, an ability aiming somewhere you did not touch. (gx_touch_debug.txt)</string>
     <string name="setup_switch_gx_perf">Performance summary</string>
     <string name="setup_switch_gx_perf_desc">Adds one short line per second showing where frame time goes (radar, audio, network, game logic, rendering). Safe to leave on for a whole play session — turn this on for FPS/slowdown reports. (gx_perf.txt)</string>
-    <string name="setup_switch_catchup_off">Disable speed catch-up</string>
-    <string name="setup_switch_catchup_off_desc">Offline games only: at most one game-logic step per drawn frame, so a phone that cannot keep up with the Game Speed plays a little slower instead of stuttering. For testing the stutter on some phones. (gx_speed_catchup_off.txt)</string>
     <string name="setup_switch_viewrect_off">Disable terrain optimization</string>
     <string name="setup_switch_viewrect_off_desc">Draws the shoreline and terrain blend layers for the whole map area again, as before 1.4.5 12202. Costs frame time; turn on only to test a graphics problem such as a grey fog over the map. (gx_terrain_viewrect_off.txt)</string>
     <string name="setup_diagnostics_disclaimer">For testing and debugging purposes only. May impact performance.</string>

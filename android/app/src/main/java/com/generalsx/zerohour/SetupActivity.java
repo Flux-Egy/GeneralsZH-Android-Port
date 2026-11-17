@@ -5716,16 +5716,17 @@ public class SetupActivity extends Activity {
     // parentheses so a tester can match it up with exact instructions from
     // an issue reporter/maintainer.
     private static final String[] DIAGNOSTIC_MARKERS = {
-        // GeneralsX @feature Flux Build 17/11/2026 v1.4.5 12206 The 12204 test switches (owner): speed catch-up
-        // off (GameEngine.cpp gxCatchUpSwitchedOff) and the terrain view rect off (BaseHeightMap.cpp).
-        "gx_trace.txt", "gx_perf.txt", "gx_speed_catchup_off.txt", "gx_terrain_viewrect_off.txt",
+        // GeneralsX @feature Flux Build 17/11/2026 v1.4.5 12206 The terrain view rect off (BaseHeightMap.cpp), a test
+        // switch for the owner's fog report. GeneralsX @tweak Flux Build 17/11/2026 v1.4.5 12208 The speed catch-up
+        // switch is gone: the catch-up is off by default now (GameEngine.cpp gxCatchUpEnabled).
+        "gx_trace.txt", "gx_perf.txt", "gx_terrain_viewrect_off.txt",
         "gx_gles_gputimer.txt", "gx_audio_trace.txt", "gx_net_trace.txt",
         "gx_touch_debug.txt", "dxvk_hud.txt",
         "dxvk_validation.txt", "dxvk_verbose_log.txt"
     };
     private static final int[] DIAGNOSTIC_TITLES = {
         R.string.setup_switch_gx_trace, R.string.setup_switch_gx_perf,
-        R.string.setup_switch_catchup_off, R.string.setup_switch_viewrect_off, R.string.setup_switch_gpu_timer,
+        R.string.setup_switch_viewrect_off, R.string.setup_switch_gpu_timer,
         R.string.setup_switch_gx_audio_trace, R.string.setup_switch_gx_net_trace,
         R.string.setup_switch_touch_debug,
         R.string.setup_switch_dxvk_hud, R.string.setup_switch_dxvk_validation,
@@ -5733,7 +5734,7 @@ public class SetupActivity extends Activity {
     };
     private static final int[] DIAGNOSTIC_DESCRIPTIONS = {
         R.string.setup_switch_gx_trace_desc, R.string.setup_switch_gx_perf_desc,
-        R.string.setup_switch_catchup_off_desc, R.string.setup_switch_viewrect_off_desc, R.string.setup_switch_gpu_timer_desc,
+        R.string.setup_switch_viewrect_off_desc, R.string.setup_switch_gpu_timer_desc,
         R.string.setup_switch_gx_audio_trace_desc, R.string.setup_switch_gx_net_trace_desc,
         R.string.setup_switch_touch_debug_desc,
         R.string.setup_switch_dxvk_hud_desc, R.string.setup_switch_dxvk_validation_desc,

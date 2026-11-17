@@ -1036,21 +1036,23 @@ extern NGMPGame* TheNGMPGame;
 // the same order, only grouped differently between draws: replays and saves are unaffected.
 static UnsignedInt s_gxCatchUpSteps = 0;
 
-// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12204 The owner's A/B switch, as in Zero Hour:
-// gx_speed_catchup_off.txt in the game folder turns the catch-up off (at most one logic step per drawn frame).
-static Bool gxCatchUpSwitchedOff()
+// GeneralsX @performance Flux Build 17/11/2026 v1.4.5 12208 The speed catch-up is OFF by default (owner), like
+// MYSOREZ 1.4.1: at most one logic step per drawn frame. A/B on a Snapdragon 8s Gen 4 (Contra X, Desert Rats, 6
+// players, Game Speed at the top): with it, 106 fps and 4.2% of frames over 20 ms -- 118 extra steps a second, each
+// frame stepping 1 to 4 times, eating the next frame's time; without it, 126 fps and 0.4% over 20 ms. The price: a
+// phone that cannot draw the speed the slider asks plays slower than asked (220 -> 126 logic steps a second there),
+// as on MYSOREZ and the PC. The code stays for a later opt-in; nothing calls it with steps to take. Offline only
+// either way (the catch-up requires no TheNetwork); same logic frames in the same order: no CRC, replay or network
+// change.
+static Bool gxCatchUpEnabled()
 {
-	static int s_state = -1;
-	if (s_state < 0)
+	static Bool s_logged = FALSE;
+	if (!s_logged)
 	{
-		FILE *f = fopen("gx_speed_catchup_off.txt", "r");
-		s_state = f != nullptr ? 1 : 0;
-		if (f != nullptr)
-			fclose(f);
-		fprintf(stderr, "[GX-PERF-LOGIC] speed catch-up %s\n", s_state ? "OFF (gx_speed_catchup_off.txt): at most one logic step per drawn frame"
-			: "on (up to 3 extra logic steps a frame, 8 ms, offline above normal speed)");
+		s_logged = TRUE;
+		fprintf(stderr, "[GX-PERF-LOGIC] speed catch-up off (default since 12208): at most one logic step per drawn frame\n");
 	}
-	return s_state == 1;
+	return FALSE;
 }
 
 static void gxCatchUpSpedUpLogic(Bool steppedThisFrame)
@@ -1089,7 +1091,7 @@ static void gxCatchUpSpedUpLogic(Bool steppedThisFrame)
 		&& !TheFramePacer->isTimeFrozen() && !TheFramePacer->isGameHalted()
 		&& TheFramePacer->isActualFramesPerSecondLimitEnabled()
 		&& gxTargetFps > normalFps
-		&& !gxCatchUpSwitchedOff();
+		&& gxCatchUpEnabled();
 	if (!applies)
 	{
 		s_debt = 0.0;
